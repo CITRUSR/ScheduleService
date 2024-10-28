@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ScheduleService.Application.Contracts;
 
 namespace ScheduleService.Infrastructure;
 
@@ -10,6 +11,8 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
+        services.AddSingleton<IDbContext, DbContext>();
+
         return services;
     }
 }
