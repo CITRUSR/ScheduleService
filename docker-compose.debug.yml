@@ -1,0 +1,14 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+version: '3.4'
+
+services:
+  scheduleserviceapi:
+    image: scheduleserviceapi
+    build:
+      context: .
+      dockerfile: ScheduleService.API/Dockerfile
+      args:
+        - configuration=Debug
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
