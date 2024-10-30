@@ -1,3 +1,5 @@
+using System.Reflection;
+using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
@@ -12,6 +14,18 @@ public static class DependencyInjection
     )
     {
         services.AddSingleton<IDbContext, DbContext>();
+
+        services
+            .AddLogging(c => c.AddFluentMigratorConsole())
+            .AddFluentMigratorCore()
+            .ConfigureRunner(c =>
+                c.AddPostgres15_0()
+                    .WithGlobalConnectionString(
+                        configuration.GetConnectionString("DbConnectionString")
+                    )
+                    .ScanIn(typeof(DependencyInjection).Assembly)
+                    .For.All()
+            );
 
         return services;
     }
