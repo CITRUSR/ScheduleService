@@ -3,10 +3,12 @@
   <ItemGroup>
     <ProjectReference Include="..\ScheduleService.Domain\ScheduleService.Domain.csproj" />
     <ProjectReference Include="..\ScheduleService.Application\ScheduleService.Application.csproj" />
+    <EmbeddedResource Include="Migrations/**/*.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="dbup-postgresql" Version="5.0.40" />
     <PackageReference Include="FluentMigrator" Version="6.2.0" />
     <PackageReference Include="Npgsql" Version="8.0.5" />
   </ItemGroup>
