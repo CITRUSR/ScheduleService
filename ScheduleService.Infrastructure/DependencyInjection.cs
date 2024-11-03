@@ -2,6 +2,7 @@ using DbUp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Infrastructure.Repositories;
 
 namespace ScheduleService.Infrastructure;
 
@@ -25,6 +26,8 @@ public static class DependencyInjection
             .Build();
 
         upgrader.PerformUpgrade();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
