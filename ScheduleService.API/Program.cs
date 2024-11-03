@@ -1,3 +1,4 @@
+using ScheduleService.API.Services;
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
 
@@ -18,5 +19,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapGrpcService<ColorService>();
 
 await app.RunAsync();
