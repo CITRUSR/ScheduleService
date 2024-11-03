@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Protobuf Include="Protos/color.proto" GrpcServices="Server, Client"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.66.0" />
     <PackageReference Include="Grpc.Tools" Version="2.67.0">
