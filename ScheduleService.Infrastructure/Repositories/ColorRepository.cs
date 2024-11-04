@@ -1,5 +1,7 @@
+using Dapper;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
+using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
@@ -22,9 +24,17 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
         throw new NotImplementedException();
     }
 
-    public Task<Color> InsertAsync(Color color)
+    public async Task<Color> InsertAsync(Color color)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+        var colorId = await connection.QuerySingleAsync<int>(
+            ColorQueries.InsertColor,
+            new { color.Name }
+        );
+
+        var createdColor = new Color { Id = colorId, Name = color.Name };
+
+        return createdColor;
     }
 
     public Task<Color> UpdateAsync(Color color)
