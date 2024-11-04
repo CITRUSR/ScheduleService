@@ -7,9 +7,15 @@ public static class ColorQueries
         INSERT INTO colors (name)
         VALUES (@Name) RETURNING id;
         ";
-    public static string GetColorById = 
+    public static string GetColorById =
         @"
             SELECT * FROM colors
+            WHERE id = @Id;
+        ";
+    public static string UpdateColor =
+        @"
+            UPDATE colors
+            SET name = @Name
             WHERE id = @Id;
         ";
 }

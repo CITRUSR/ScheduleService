@@ -39,8 +39,12 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
         return createdColor;
     }
 
-    public Task<Color> UpdateAsync(Color color)
+    public async Task<Color> UpdateAsync(Color color)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        await connection.ExecuteAsync(ColorQueries.UpdateColor, new { color.Name, color.Id });
+    
+        return color;
     }
 }
