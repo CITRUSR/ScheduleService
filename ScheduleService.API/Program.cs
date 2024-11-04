@@ -1,4 +1,5 @@
 using ScheduleService.API.Interceptors;
+using ScheduleService.API.Services;
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
 using Serilog;
@@ -18,6 +19,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddGrpc();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -27,5 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapGrpcService<ColorService>();
 
 await app.RunAsync();

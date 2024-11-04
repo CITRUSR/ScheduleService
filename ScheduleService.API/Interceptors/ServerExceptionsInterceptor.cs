@@ -30,6 +30,13 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(ve.Errors)
                         )
                     );
+                case ColorNotFoundException colorNotFoundEx:
+                    throw new RpcException(
+                        new Status(
+                            StatusCode.NotFound,
+                            JsonConvert.SerializeObject(colorNotFoundEx.Message)
+                        )
+                    );
                 default:
                     throw new RpcException(
                         new Status(
