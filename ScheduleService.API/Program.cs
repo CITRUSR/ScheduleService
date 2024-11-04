@@ -1,5 +1,8 @@
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
