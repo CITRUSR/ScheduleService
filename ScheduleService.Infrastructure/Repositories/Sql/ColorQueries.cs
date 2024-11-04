@@ -18,4 +18,10 @@ public static class ColorQueries
             SET name = @Name
             WHERE id = @Id;
         ";
+    public static string DeleteColor =
+        @"
+            DELETE FROM colors
+            WHERE id = @Id;
+        ";
+
 }
