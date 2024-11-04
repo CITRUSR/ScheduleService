@@ -6,6 +6,7 @@ package color;
 
 service ColorService {
   rpc CreateColor(CreateColorRequest) returns (CreateColorResponse);
+  rpc GetColorById(GetColorByIdRequest) returns (GetColorByIdResponse);
 }
 
 message Color {
@@ -13,6 +14,15 @@ message Color {
   string Name = 2;
 }
 
+message ColorViewModel {
+  int32 Id = 1;
+  string Name = 2;
+}
+
 message CreateColorRequest { string Name = 1; }
 
 message CreateColorResponse { Color Color = 1; }
+
+message GetColorByIdRequest { int32 Id = 1; }
+
+message GetColorByIdResponse { ColorViewModel Color = 1; }
