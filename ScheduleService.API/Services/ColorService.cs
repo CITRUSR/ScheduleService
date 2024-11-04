@@ -5,6 +5,7 @@ using ScheduleService.Application.CQRS.ColorEntity.Commands.CreateColor;
 using ScheduleService.Application.CQRS.ColorEntity.Commands.DeleteColor;
 using ScheduleService.Application.CQRS.ColorEntity.Commands.UpdateColor;
 using ScheduleService.Application.CQRS.ColorEntity.Queries.GetColorById;
+using ScheduleService.Application.CQRS.ColorEntity.Queries.GetColors;
 
 namespace ScheduleService.API.Services;
 
@@ -58,5 +59,17 @@ public class ColorService(IMediator mediator) : ScheduleService.ColorService.Col
         await _mediator.Send(command);
 
         return new DeleteColorResponse();
+    }
+
+    public override async Task<GetColorsResponse> GetColors(
+        GetColorsRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = new GetColorsQuery();
+
+        var colors = await _mediator.Send(query);
+
+        return new GetColorsResponse { Colors = { colors.Adapt<List<ColorViewModel>>() } };
     }
 }
