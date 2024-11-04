@@ -23,5 +23,9 @@ public static class ColorQueries
             DELETE FROM colors
             WHERE id = @Id;
         ";
+    public static string GetAllColors =
+        @"
+            SELECT * FROM colors;
+        ";
 
 }

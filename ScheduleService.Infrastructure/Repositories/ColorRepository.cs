@@ -16,9 +16,13 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
         await connection.ExecuteAsync(ColorQueries.DeleteColor, new {id});
     }
 
-    public Task<List<Color>> GetAllAsync()
+    public async Task<List<Color>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var colors = await connection.QueryAsync<Color>(ColorQueries.GetAllColors);
+
+        return [.. colors];
     }
 
     public async Task<Color?> GetByIdAsync(int id)
