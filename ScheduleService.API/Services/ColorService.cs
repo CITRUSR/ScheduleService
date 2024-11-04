@@ -2,6 +2,7 @@ using Grpc.Core;
 using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.ColorEntity.Commands.CreateColor;
+using ScheduleService.Application.CQRS.ColorEntity.Commands.UpdateColor;
 using ScheduleService.Application.CQRS.ColorEntity.Queries.GetColorById;
 
 namespace ScheduleService.API.Services;
@@ -32,5 +33,17 @@ public class ColorService(IMediator mediator) : ScheduleService.ColorService.Col
         var color = await _mediator.Send(query);
 
         return new GetColorByIdResponse { Color = color.Adapt<ColorViewModel>() };
+    }
+
+    public override async Task<UpdateColorResponse> UpdateColor(
+        UpdateColorRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<UpdateColorCommand>();
+
+        var color = await _mediator.Send(command);
+
+        return new UpdateColorResponse { Color = color.Adapt<Color>() };
     }
 }

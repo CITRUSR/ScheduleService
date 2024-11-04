@@ -7,6 +7,7 @@ package color;
 service ColorService {
   rpc CreateColor(CreateColorRequest) returns (CreateColorResponse);
   rpc GetColorById(GetColorByIdRequest) returns (GetColorByIdResponse);
+  rpc UpdateColor(UpdateColorRequest) returns (UpdateColorResponse);
 }
 
 message Color {
@@ -26,3 +27,10 @@ message CreateColorResponse { Color Color = 1; }
 message GetColorByIdRequest { int32 Id = 1; }
 
 message GetColorByIdResponse { ColorViewModel Color = 1; }
+
+message UpdateColorRequest {
+  int32 Id = 1;
+  string Name = 2;
+}
+
+message UpdateColorResponse { Color Color = 1; }
