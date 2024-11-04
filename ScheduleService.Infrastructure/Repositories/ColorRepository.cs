@@ -19,9 +19,11 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
         throw new NotImplementedException();
     }
 
-    public Task<Color> GetByIdAsync(int id)
+    public async Task<Color?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+        var color = await connection.QueryFirstOrDefaultAsync<Color>(ColorQueries.GetColorById, new { id });
+        return color;
     }
 
     public async Task<Color> InsertAsync(Color color)
