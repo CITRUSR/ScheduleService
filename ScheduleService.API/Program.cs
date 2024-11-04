@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-using ScheduleService.API.Services;
-=======
-using ScheduleService.API.Middlewares;
->>>>>>> dev
+using ScheduleService.API.Interceptors;
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
 using Serilog;
