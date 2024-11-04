@@ -1,8 +1,20 @@
+<<<<<<< HEAD
 using ScheduleService.API.Services;
+=======
+using ScheduleService.API.Middlewares;
+>>>>>>> dev
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddGrpc(options =>
+{
+    options.Interceptors.Add<ServerExceptionsInterceptor>();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
