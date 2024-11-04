@@ -4,4 +4,12 @@ option csharp_namespace = "ScheduleService";
 
 package room;
 
+import "google/protobuf/wrappers.proto";
+
 service RoomService {}
+
+message Room {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue FullName = 3;
+}
