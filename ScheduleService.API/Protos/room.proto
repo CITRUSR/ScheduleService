@@ -6,10 +6,19 @@ package room;
 
 import "google/protobuf/wrappers.proto";
 
-service RoomService {}
+service RoomService {
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+}
 
 message Room {
   int32 Id = 1;
   string Name = 2;
   google.protobuf.StringValue FullName = 3;
 }
+
+message CreateRoomRequest {
+  string Name = 1;
+  google.protobuf.StringValue FullName = 2;
+}
+
+message CreateRoomResponse { Room Room = 1; }
