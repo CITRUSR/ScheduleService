@@ -1,4 +1,5 @@
 using ScheduleService.API.Interceptors;
+using ScheduleService.API.Services;
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
 using Serilog;

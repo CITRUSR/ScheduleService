@@ -4,6 +4,15 @@ option csharp_namespace = "ScheduleService";
 
 package color;
 
-service ColorService{
-
+service ColorService {
+  rpc CreateColor(CreateColorRequest) returns (CreateColorResponse);
 }
+
+message Color {
+  int32 Id = 1;
+  string Name = 2;
+}
+
+message CreateColorRequest { string Name = 1; }
+
+message CreateColorResponse { Color Color = 1; }
