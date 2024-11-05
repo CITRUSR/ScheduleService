@@ -9,6 +9,7 @@ import "google/protobuf/wrappers.proto";
 service RoomService {
   rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
   rpc GetRoomById(GetRoomByIdRequest) returns (GetRoomByIdResponse);
+  rpc UpdateRoom(UpdateRoomRequest) returns (UpdateRoomResponse);
 }
 
 message Room {
@@ -26,3 +27,11 @@ message CreateRoomResponse { Room Room = 1; }
 
 message GetRoomByIdRequest { int32 Id = 1; }
 message GetRoomByIdResponse { Room Room = 1; }
+
+message UpdateRoomRequest {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue FullName = 3;
+}
+
+message UpdateRoomResponse { Room Room = 1; }
