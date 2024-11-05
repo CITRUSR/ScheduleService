@@ -2,6 +2,7 @@ using Grpc.Core;
 using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.RoomEntity.Commands.CreateRoom;
+using ScheduleService.Application.CQRS.RoomEntity.Queries.GetRoomById;
 
 namespace ScheduleService.API.Services;
 
@@ -19,5 +20,17 @@ public class RoomService(IMediator mediator) : ScheduleService.RoomService.RoomS
         var room = await _mediator.Send(command);
 
         return new CreateRoomResponse { Room = room.Adapt<Room>() };
+    }
+
+    public override async Task<GetRoomByIdResponse> GetRoomById(
+        GetRoomByIdRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = request.Adapt<GetRoomByIdQuery>();
+
+        var room = await _mediator.Send(query);
+
+        return new GetRoomByIdResponse { Room = room.Adapt<Room>() };
     }
 }
