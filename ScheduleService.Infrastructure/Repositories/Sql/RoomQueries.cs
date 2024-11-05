@@ -13,4 +13,11 @@ public class RoomQueries
             SELECT name, full_name AS FullName FROM rooms
             WHERE id = @Id;
         ";
+    public static string UpdateRoom =
+        @"
+            UPDATE rooms
+            SET name = @Name,
+            full_name = @FullName
+            WHERE id = @Id;
+        ";
 }

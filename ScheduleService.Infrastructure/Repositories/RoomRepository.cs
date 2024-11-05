@@ -45,8 +45,20 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
         return room;
     }
 
-    public Task<Room> UpdateAsync(Room room)
+    public async Task<Room?> UpdateAsync(Room room)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var affectedRows = await connection.ExecuteAsync(
+            RoomQueries.UpdateRoom,
+            new
+            {
+                Name = room.Name,
+                FullName = room.FullName,
+                Id = room.Id
+            }
+        );
+
+        return affectedRows == 1 ? room : null;
     }
 }
