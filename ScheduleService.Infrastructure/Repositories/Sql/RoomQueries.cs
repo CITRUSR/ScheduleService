@@ -8,4 +8,9 @@ public class RoomQueries
             VALUES (@Name, @FullName)
             RETURNING id;
         ";
+    public static string GetRoomById =
+        @"
+            SELECT name, full_name AS FullName FROM rooms
+            WHERE id = @Id;
+        ";
 }

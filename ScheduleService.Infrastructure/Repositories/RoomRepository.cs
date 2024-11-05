@@ -19,9 +19,16 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
         throw new NotImplementedException();
     }
 
-    public Task<Room?> GetByIdAsync(int id)
+    public async Task<Room?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var room = await connection.QueryFirstOrDefaultAsync<Room>(
+            RoomQueries.GetRoomById,
+            new { id }
+        );
+
+        return room;
     }
 
     public async Task<Room> InsertAsync(Room room)
