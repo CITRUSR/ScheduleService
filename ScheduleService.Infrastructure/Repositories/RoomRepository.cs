@@ -9,9 +9,16 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 {
     private readonly IDbContext _dbContext = dbContext;
 
-    public Task DeleteAsync(int id)
+    public async Task<Room?> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var room = await connection.QueryFirstOrDefaultAsync<Room>(
+            RoomQueries.DeleteRoom,
+            new { id }
+        );
+
+        return room;
     }
 
     public Task<List<Room>> GetAllAsync()
