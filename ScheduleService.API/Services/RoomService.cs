@@ -5,6 +5,7 @@ using ScheduleService.Application.CQRS.RoomEntity.Commands.CreateRoom;
 using ScheduleService.Application.CQRS.RoomEntity.Commands.DeleteRoom;
 using ScheduleService.Application.CQRS.RoomEntity.Commands.UpdateRoom;
 using ScheduleService.Application.CQRS.RoomEntity.Queries.GetRoomById;
+using ScheduleService.Application.CQRS.RoomEntity.Queries.GetRooms;
 
 namespace ScheduleService.API.Services;
 
@@ -58,5 +59,17 @@ public class RoomService(IMediator mediator) : ScheduleService.RoomService.RoomS
         var room = await _mediator.Send(command);
 
         return new DeleteRoomResponse { Room = room.Adapt<Room>() };
+    }
+
+    public override async Task<GetRoomsResponse> GetRooms(
+        GetRoomsRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = request.Adapt<GetRoomsQuery>();
+
+        var rooms = await _mediator.Send(query);
+
+        return new GetRoomsResponse { Rooms = { rooms.Adapt<List<Room>>() } };
     }
 }

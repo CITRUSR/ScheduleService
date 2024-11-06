@@ -4,6 +4,7 @@ option csharp_namespace = "ScheduleService";
 
 package room;
 
+import "Protos/shared.proto";
 import "google/protobuf/wrappers.proto";
 
 service RoomService {
@@ -11,6 +12,7 @@ service RoomService {
   rpc GetRoomById(GetRoomByIdRequest) returns (GetRoomByIdResponse);
   rpc UpdateRoom(UpdateRoomRequest) returns (UpdateRoomResponse);
   rpc DeleteRoom(DeleteRoomRequest) returns (DeleteRoomResponse);
+  rpc GetRooms(GetRoomsRequest) returns (GetRoomsResponse);
 }
 
 message Room {
