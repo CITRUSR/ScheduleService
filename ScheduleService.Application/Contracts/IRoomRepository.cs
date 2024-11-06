@@ -1,3 +1,5 @@
+using ScheduleService.Application.Common.Models;
+using ScheduleService.Application.CQRS.RoomEntity.Queries.GetRooms;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.Contracts;

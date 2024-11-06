@@ -1,5 +1,8 @@
+using System.Text;
 using Dapper;
+using ScheduleService.Application.Common.Models;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.CQRS.RoomEntity.Queries.GetRooms;
 using ScheduleService.Domain.Entities;
 using ScheduleService.Infrastructure.Repositories.Sql;
 
@@ -21,9 +24,39 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
         return room;
     }
 
-    public Task<List<Room>> GetAllAsync()
+    public async Task<List<Room>> GetAsync(
+        RoomFilter filter,
+        PaginationParameters paginationParameters
+    )
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        StringBuilder queryBuilder = new StringBuilder();
+
+        queryBuilder.Append(RoomQueries.GetRooms);
+
+        if (!string.IsNullOrWhiteSpace(filter.SearchString))
+        {
+            queryBuilder.Append($"WHERE CONCAT(name, full_name) LIKE '%{filter.SearchString}%'");
+        }
+
+        string orderedCol = filter.FilterBy switch
+        {
+            RoomFilterState.Name => "name",
+            RoomFilterState.FullName => "full_name",
+        };
+
+        queryBuilder.Append($" ORDER BY {orderedCol} {filter.OrderState}");
+
+        queryBuilder.Append($" LIMIT {paginationParameters.PageSize}");
+
+        queryBuilder.Append(
+            $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
+        );
+
+        var rooms = await connection.QueryAsync<Room>(queryBuilder.ToString());
+
+        return [.. rooms];
     }
 
     public async Task<Room?> GetByIdAsync(int id)

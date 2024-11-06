@@ -26,4 +26,8 @@ public class RoomQueries
             WHERE id = @Id
             RETURNING id, name, full_name AS FullName;
         ";
+    public static string GetRooms =
+        @"
+            SELECT * FROM rooms
+        ";
 }
