@@ -6,18 +6,24 @@ namespace ScheduleService.Infrastructure.Repositories;
 public class UnitOfWork : IUnitOfWork, IDisposable
 {
     public IColorRepository ColorRepository { get; }
+    public IRoomRepository RoomRepository { get; }
     private readonly IDbContext _dbContext;
 
     private readonly IDbConnection _connection;
     private IDbTransaction _transaction;
 
-    public UnitOfWork(IDbContext dbContext, IColorRepository colorRepository)
+    public UnitOfWork(
+        IDbContext dbContext,
+        IColorRepository colorRepository,
+        IRoomRepository roomRepository
+    )
     {
         _dbContext = dbContext;
         _connection = _dbContext.CreateConnection();
         _connection.Open();
         _transaction = _connection.BeginTransaction();
         ColorRepository = colorRepository;
+        RoomRepository = roomRepository;
     }
 
     public void CommitTransaction()

@@ -28,6 +28,7 @@ public static class DependencyInjection
         upgrader.PerformUpgrade();
 
         services.AddScoped<IColorRepository, ColorRepository>();
+        services.AddScoped<IRoomRepository, RoomRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+enum OrderState {
+  Asc = 0;
+  Desc = 1;
+}
+
+message PaginationParameters {
+  int32 Page = 1;
+  int32 PageSize = 2;
+}

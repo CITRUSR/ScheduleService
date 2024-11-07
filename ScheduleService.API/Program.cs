@@ -32,5 +32,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGrpcService<ColorService>();
+app.MapGrpcService<RoomService>();
 
 await app.RunAsync();
