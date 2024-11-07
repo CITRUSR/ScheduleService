@@ -44,6 +44,13 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(roomNotFoundEx.Message)
                         )
                     );
+                case RoomNameAlreadyExistsException roomNameExistsEx:
+                    throw new RpcException(
+                        new Status(
+                            StatusCode.AlreadyExists,
+                            JsonConvert.SerializeObject(roomNameExistsEx.Message)
+                        )
+                    );
                 default:
                     throw new RpcException(
                         new Status(
