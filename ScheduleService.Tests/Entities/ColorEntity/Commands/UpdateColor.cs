@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using Moq;
+using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.CQRS.ColorEntity.Commands.UpdateColor;
@@ -49,5 +50,21 @@ public class UpdateColor
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
         await act.Should().ThrowAsync<ColorNotFoundException>();
+    }
+
+    [Fact]
+    public async Task UpdateColor_ShouldBe_ColorNameAlreadyExistsException()
+    {
+        _mockUnitOfWork
+            .Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()))
+            .ReturnsAsync(new Color());
+
+        _mockUnitOfWork
+            .Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()))
+            .Throws(new PostgresException("Unique", "severity", "invariantServerity", "23505"));
+
+        Func<Task> act = async () => await _handler.Handle(_command, default);
+
+        await act.Should().ThrowAsync<ColorNameAlreadyExistsException>();
     }
 }

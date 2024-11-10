@@ -1,4 +1,5 @@
 using MediatR;
+using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
@@ -14,14 +15,29 @@ public class UpdateColorCommandHandler(IUnitOfWork unitOfWork)
     {
         var newColor = new Color() { Id = request.Id, Name = request.Name };
 
-        var updatedColor = await _unitOfWork.ColorRepository.UpdateAsync(newColor);
+        Color updatedColor;
 
-        if (updatedColor == null)
+        try
         {
-            throw new ColorNotFoundException(request.Id);
-        }
+            updatedColor = await _unitOfWork.ColorRepository.UpdateAsync(newColor);
 
-        _unitOfWork.CommitTransaction();
+            if (updatedColor == null)
+            {
+                throw new ColorNotFoundException(request.Id);
+            }
+
+            _unitOfWork.CommitTransaction();
+        }
+        catch (NpgsqlException ex) when (ex.SqlState == "23505")
+        {
+            _unitOfWork.RollbackTransaction();
+            throw new ColorNameAlreadyExistsException(request.Name);
+        }
+        catch
+        {
+            _unitOfWork.RollbackTransaction();
+            throw;
+        }
 
         return updatedColor;
     }
