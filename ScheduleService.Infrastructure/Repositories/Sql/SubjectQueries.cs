@@ -1,3 +1,11 @@
 namespace ScheduleService.Infrastructure.Repositories.Sql;
 
-public static class SubjectQueries { }
+public static class SubjectQueries
+{
+    public static string InsertSubject =
+        @"
+            INSERT INTO subjects (name, abbreviation)
+            VALUES (@Name, @Abbreviation)
+            RETURNING id;
+        ";
+}

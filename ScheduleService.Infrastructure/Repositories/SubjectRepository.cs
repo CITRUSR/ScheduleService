@@ -1,5 +1,7 @@
+using Dapper;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
+using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
@@ -22,9 +24,18 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         throw new NotImplementedException();
     }
 
-    public Task<Subject> InsertAsync(Subject subject)
+    public async Task<Subject> InsertAsync(Subject subject)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var subjectId = await connection.QuerySingleAsync<int>(
+            SubjectQueries.InsertSubject,
+            new { subject.Name, subject.Abbreviation }
+        );
+
+        subject.Id = subjectId;
+
+        return subject;
     }
 
     public Task<Subject?> UpdateAsync(Subject subject)
