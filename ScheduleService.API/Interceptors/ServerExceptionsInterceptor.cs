@@ -44,6 +44,13 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(roomNotFoundEx.Message)
                         )
                     );
+                case SubjectNotFoundException subjectNotFoundEx:
+                    throw new RpcException(
+                        new Status(
+                            StatusCode.NotFound,
+                            JsonConvert.SerializeObject(subjectNotFoundEx.Message)
+                        )
+                    );
                 case RoomNameAlreadyExistsException roomNameExistsEx:
                     throw new RpcException(
                         new Status(
