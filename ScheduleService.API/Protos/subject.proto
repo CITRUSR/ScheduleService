@@ -4,4 +4,12 @@ option csharp_namespace = "ScheduleService";
 
 package subject;
 
+import "google/protobuf/wrappers.proto";
+
 service SubjectService {}
+
+message Subject {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue Abbreviation = 3;
+}
