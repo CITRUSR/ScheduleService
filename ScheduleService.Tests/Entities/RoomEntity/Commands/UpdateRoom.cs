@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using Moq;
+using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.CQRS.RoomEntity.Commands.UpdateRoom;
@@ -49,5 +50,21 @@ public class UpdateRoom
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
         await act.Should().ThrowAsync<RoomNotFoundException>();
+    }
+
+    [Fact]
+    public async Task UpdateRoom_ShouldBe_RoomNameAlreadyExistsException()
+    {
+        _mockUnitOfWork
+            .Setup(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()))
+            .ReturnsAsync(new Room());
+
+        _mockUnitOfWork
+            .Setup(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()))
+            .Throws(new PostgresException("Unique", "severity", "invariantServerity", "23505"));
+
+        Func<Task> act = async () => await _handler.Handle(_command, default);
+
+        await act.Should().ThrowAsync<RoomNameAlreadyExistsException>();
     }
 }

@@ -1,4 +1,5 @@
 using MediatR;
+using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
@@ -19,14 +20,29 @@ public class UpdateRoomCommandHandler(IUnitOfWork unitOfWork)
             FullName = request.FullName
         };
 
-        var updatedRoom = await _unitOfWork.RoomRepository.UpdateAsync(newRoom);
+        Room updatedRoom;
 
-        if (updatedRoom == null)
+        try
         {
-            throw new RoomNotFoundException(request.Id);
-        }
+            updatedRoom = await _unitOfWork.RoomRepository.UpdateAsync(newRoom);
 
-        _unitOfWork.CommitTransaction();
+            if (updatedRoom == null)
+            {
+                throw new RoomNotFoundException(request.Id);
+            }
+
+            _unitOfWork.CommitTransaction();
+        }
+        catch (NpgsqlException ex) when (ex.SqlState == "23505")
+        {
+            _unitOfWork.RollbackTransaction();
+            throw new RoomNameAlreadyExistsException(request.Name);
+        }
+        catch
+        {
+            _unitOfWork.RollbackTransaction();
+            throw;
+        }
 
         return updatedRoom;
     }
