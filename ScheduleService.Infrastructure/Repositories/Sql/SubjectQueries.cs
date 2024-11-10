@@ -8,4 +8,9 @@ public static class SubjectQueries
             VALUES (@Name, @Abbreviation)
             RETURNING id;
         ";
+    public static string GetSubjectById =
+        @"
+            SELECT * FROM subjects
+            WHERE id = @Id;
+        ";
 }

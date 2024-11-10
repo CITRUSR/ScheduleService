@@ -19,9 +19,16 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         throw new NotImplementedException();
     }
 
-    public Task<Subject?> GetByIdAsync(int id)
+    public async Task<Subject?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var subject = await connection.QueryFirstOrDefaultAsync<Subject>(
+            SubjectQueries.GetSubjectById,
+            new { id }
+        );
+
+        return subject;
     }
 
     public async Task<Subject> InsertAsync(Subject subject)
