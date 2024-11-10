@@ -6,10 +6,19 @@ package subject;
 
 import "google/protobuf/wrappers.proto";
 
-service SubjectService {}
+service SubjectService {
+  rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
+}
 
 message Subject {
   int32 Id = 1;
   string Name = 2;
   google.protobuf.StringValue Abbreviation = 3;
 }
+
+message CreateSubjectRequest {
+  string Name = 1;
+  google.protobuf.StringValue Abbreviation = 2;
+}
+
+message CreateSubjectResponse { Subject Subject = 1; }
