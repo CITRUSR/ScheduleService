@@ -58,6 +58,13 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(colorNameExistsEx.Message)
                         )
                     );
+                case SubjectNameAlreadyExistsException subjectNameExistsEx:
+                    throw new RpcException(
+                        new Status(
+                            StatusCode.AlreadyExists,
+                            JsonConvert.SerializeObject(subjectNameExistsEx.Message)
+                        )
+                    );
                 default:
                     throw new RpcException(
                         new Status(
