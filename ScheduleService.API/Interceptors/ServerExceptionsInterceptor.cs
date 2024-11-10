@@ -51,6 +51,13 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(roomNameExistsEx.Message)
                         )
                     );
+                case ColorNameAlreadyExistsException colorNameExistsEx:
+                    throw new RpcException(
+                        new Status(
+                            StatusCode.AlreadyExists,
+                            JsonConvert.SerializeObject(colorNameExistsEx.Message)
+                        )
+                    );
                 default:
                     throw new RpcException(
                         new Status(
