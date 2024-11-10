@@ -12,16 +12,14 @@ public class UpdateColorCommandHandler(IUnitOfWork unitOfWork)
 
     public async Task<Color> Handle(UpdateColorCommand request, CancellationToken cancellationToken)
     {
-        var color = await _unitOfWork.ColorRepository.GetByIdAsync(request.Id);
-
-        if (color == null)
-        {
-            throw new ColorNotFoundException(request.Id);
-        }
-
         var newColor = new Color() { Id = request.Id, Name = request.Name };
 
         var updatedColor = await _unitOfWork.ColorRepository.UpdateAsync(newColor);
+
+        if (updatedColor == null)
+        {
+            throw new ColorNotFoundException(request.Id);
+        }
 
         _unitOfWork.CommitTransaction();
 

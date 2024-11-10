@@ -27,16 +27,10 @@ public class UpdateColor
     public async Task UpdateColor_ShouldBe_Success()
     {
         _mockUnitOfWork
-            .Setup(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new Color());
-
-        _mockUnitOfWork
             .Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()))
             .ReturnsAsync(new Color());
 
         var result = await _handler.Handle(_command, default);
-
-        _mockUnitOfWork.Verify(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()), Times.Once());
 
         _mockUnitOfWork.Verify(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()), Times.Once());
 

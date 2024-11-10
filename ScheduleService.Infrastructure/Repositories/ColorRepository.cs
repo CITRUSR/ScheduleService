@@ -13,7 +13,7 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
     {
         using var connection = _dbContext.CreateConnection();
 
-        await connection.ExecuteAsync(ColorQueries.DeleteColor, new {id});
+        await connection.ExecuteAsync(ColorQueries.DeleteColor, new { id });
     }
 
     public async Task<List<Color>> GetAllAsync()
@@ -28,7 +28,10 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
     public async Task<Color?> GetByIdAsync(int id)
     {
         using var connection = _dbContext.CreateConnection();
-        var color = await connection.QueryFirstOrDefaultAsync<Color>(ColorQueries.GetColorById, new { id });
+        var color = await connection.QueryFirstOrDefaultAsync<Color>(
+            ColorQueries.GetColorById,
+            new { id }
+        );
         return color;
     }
 
@@ -45,12 +48,15 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
         return createdColor;
     }
 
-    public async Task<Color> UpdateAsync(Color color)
+    public async Task<Color?> UpdateAsync(Color color)
     {
         using var connection = _dbContext.CreateConnection();
 
-        await connection.ExecuteAsync(ColorQueries.UpdateColor, new { color.Name, color.Id });
-    
-        return color;
+        var affectedRows = await connection.ExecuteAsync(
+            ColorQueries.UpdateColor,
+            new { color.Name, color.Id }
+        );
+
+        return affectedRows == 1 ? color : null;
     }
 }
