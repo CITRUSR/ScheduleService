@@ -7,6 +7,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
 {
     public IColorRepository ColorRepository { get; }
     public IRoomRepository RoomRepository { get; }
+    public ISubjectRepository SubjectRepository { get; }
+
     private readonly IDbContext _dbContext;
 
     private readonly IDbConnection _connection;
@@ -15,7 +17,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public UnitOfWork(
         IDbContext dbContext,
         IColorRepository colorRepository,
-        IRoomRepository roomRepository
+        IRoomRepository roomRepository,
+        ISubjectRepository subjectRepository
     )
     {
         _dbContext = dbContext;
@@ -24,6 +27,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         _transaction = _connection.BeginTransaction();
         ColorRepository = colorRepository;
         RoomRepository = roomRepository;
+        SubjectRepository = subjectRepository;
     }
 
     public void CommitTransaction()
