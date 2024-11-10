@@ -8,5 +8,5 @@ public interface IColorRepository
     Task<Color?> GetByIdAsync(int id);
     Task<Color> InsertAsync(Color color);
     Task<Color?> UpdateAsync(Color color);
-    Task DeleteAsync(int id);
+    Task<Color?> DeleteAsync(int id);
 }

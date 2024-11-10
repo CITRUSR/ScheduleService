@@ -38,7 +38,7 @@ message UpdateColorRequest {
 message UpdateColorResponse { Color Color = 1; }
 
 message DeleteColorRequest { int32 Id = 1; }
-message DeleteColorResponse {}
+message DeleteColorResponse { Color Color = 1; }
 
 message GetColorsRequest {}
 message GetColorsResponse { repeated ColorViewModel Colors = 1; }

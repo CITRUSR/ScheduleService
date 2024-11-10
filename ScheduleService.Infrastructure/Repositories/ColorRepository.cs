@@ -9,11 +9,16 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
 {
     private readonly IDbContext _dbContext = dbContext;
 
-    public async Task DeleteAsync(int id)
+    public async Task<Color?> DeleteAsync(int id)
     {
         using var connection = _dbContext.CreateConnection();
 
-        await connection.ExecuteAsync(ColorQueries.DeleteColor, new { id });
+        var color = await connection.QueryFirstOrDefaultAsync<Color>(
+            ColorQueries.DeleteColor,
+            new { id }
+        );
+
+        return color;
     }
 
     public async Task<List<Color>> GetAllAsync()
