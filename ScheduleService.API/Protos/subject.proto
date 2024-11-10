@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package subject;
+
+service SubjectService {}
