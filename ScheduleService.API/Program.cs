@@ -33,5 +33,6 @@ app.UseHttpsRedirection();
 
 app.MapGrpcService<ColorService>();
 app.MapGrpcService<RoomService>();
+app.MapGrpcService<SubjectService>();
 
 await app.RunAsync();
