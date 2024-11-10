@@ -8,6 +8,7 @@ import "google/protobuf/wrappers.proto";
 
 service SubjectService {
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
+  rpc GetSubjectById(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
 }
 
 message Subject {
@@ -22,3 +23,7 @@ message CreateSubjectRequest {
 }
 
 message CreateSubjectResponse { Subject Subject = 1; }
+
+message GetSubjectByIdRequest { int32 Id = 1; }
+
+message GetSubjectByIdResponse { Subject Subject = 1; }
