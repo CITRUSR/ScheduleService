@@ -21,11 +21,11 @@ public static class ColorQueries
     public static string DeleteColor =
         @"
             DELETE FROM colors
-            WHERE id = @Id;
+            WHERE id = @Id
+            RETURNING id, name;
         ";
     public static string GetAllColors =
         @"
             SELECT * FROM colors;
         ";
-
 }

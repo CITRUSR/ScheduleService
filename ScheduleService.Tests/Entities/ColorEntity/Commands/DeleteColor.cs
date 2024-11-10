@@ -27,12 +27,10 @@ public class DeleteColor
     public async Task DeleteColor_ShouldBe_Success()
     {
         _mockUnitOfWork
-            .Setup(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()))
+            .Setup(x => x.ColorRepository.DeleteAsync(It.IsAny<int>()))
             .ReturnsAsync(new Color());
 
         await _handler.Handle(_command, default);
-
-        _mockUnitOfWork.Verify(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()), Times.Once());
 
         _mockUnitOfWork.Verify(x => x.ColorRepository.DeleteAsync(It.IsAny<int>()), Times.Once());
 
@@ -43,7 +41,7 @@ public class DeleteColor
     public async Task DeleteColor_ShouldBe_ColorNotFoundException()
     {
         _mockUnitOfWork
-            .Setup(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()))
+            .Setup(x => x.ColorRepository.DeleteAsync(It.IsAny<int>()))
             .ReturnsAsync((Color?)null);
 
         Func<Task> act = async () => await _handler.Handle(_command, default);

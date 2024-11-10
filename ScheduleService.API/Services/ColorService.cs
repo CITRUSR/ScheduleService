@@ -56,9 +56,9 @@ public class ColorService(IMediator mediator) : ScheduleService.ColorService.Col
     {
         var command = request.Adapt<DeleteColorCommand>();
 
-        await _mediator.Send(command);
+        var color = await _mediator.Send(command);
 
-        return new DeleteColorResponse();
+        return new DeleteColorResponse() { Color = color.Adapt<Color>() };
     }
 
     public override async Task<GetColorsResponse> GetColors(
