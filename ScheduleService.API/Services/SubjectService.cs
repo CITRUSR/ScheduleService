@@ -5,6 +5,7 @@ using ScheduleService.Application.CQRS.SubjectEntity.Commands.CreateSubject;
 using ScheduleService.Application.CQRS.SubjectEntity.Commands.DeleteSubject;
 using ScheduleService.Application.CQRS.SubjectEntity.Commands.UpdateSubject;
 using ScheduleService.Application.CQRS.SubjectEntity.Queries.GetSubjectById;
+using ScheduleService.Application.CQRS.SubjectEntity.Queries.GetSubjects;
 
 namespace ScheduleService.API.Services;
 
@@ -58,5 +59,17 @@ public class SubjectService(IMediator mediator) : ScheduleService.SubjectService
         var subject = await _mediator.Send(command);
 
         return new DeleteSubjectResponse() { Subject = subject.Adapt<Subject>() };
+    }
+
+    public override async Task<GetSubjectsResponse> GetSubjcts(
+        GetSubjctsRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = request.Adapt<GetSubjectsQuery>();
+
+        var subjects = await _mediator.Send(query);
+
+        return new GetSubjectsResponse() { Subjects = { subjects.Adapt<List<Subject>>() } };
     }
 }
