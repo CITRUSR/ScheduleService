@@ -10,6 +10,7 @@ service SubjectService {
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
   rpc GetSubjectById(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
   rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
+  rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
 }
 
 message Subject {
@@ -36,3 +37,6 @@ message UpdateSubjectRequest {
 }
 
 message UpdateSubjectResponse { Subject Subject = 1; }
+
+message DeleteSubjectRequest { int32 Id = 1; }
+message DeleteSubjectResponse { Subject Subject = 1; }

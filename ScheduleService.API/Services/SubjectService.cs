@@ -2,6 +2,7 @@ using Grpc.Core;
 using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.SubjectEntity.Commands.CreateSubject;
+using ScheduleService.Application.CQRS.SubjectEntity.Commands.DeleteSubject;
 using ScheduleService.Application.CQRS.SubjectEntity.Commands.UpdateSubject;
 using ScheduleService.Application.CQRS.SubjectEntity.Queries.GetSubjectById;
 
@@ -45,5 +46,17 @@ public class SubjectService(IMediator mediator) : ScheduleService.SubjectService
         var subject = await _mediator.Send(command);
 
         return new UpdateSubjectResponse() { Subject = subject.Adapt<Subject>() };
+    }
+
+    public override async Task<DeleteSubjectResponse> DeleteSubject(
+        DeleteSubjectRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<DeleteSubjectCommand>();
+
+        var subject = await _mediator.Send(command);
+
+        return new DeleteSubjectResponse() { Subject = subject.Adapt<Subject>() };
     }
 }
