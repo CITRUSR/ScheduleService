@@ -20,4 +20,10 @@ public static class SubjectQueries
             abbreviation = @Abbreviation
             WHERE id = @Id;
         ";
+    public static string DeleteSubject =
+        @"
+            DELETE FROM subjects
+            WHERE id = @Id
+            RETURNING *;
+        ";
 }

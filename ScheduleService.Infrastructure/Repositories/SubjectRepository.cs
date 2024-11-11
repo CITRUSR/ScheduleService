@@ -9,9 +9,16 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
 {
     private readonly IDbContext _dbContext = dbContext;
 
-    public Task<Subject?> DeleteAsync(int id)
+    public async Task<Subject?> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var subject = await connection.QueryFirstOrDefaultAsync<Subject>(
+            SubjectQueries.DeleteSubject,
+            new { id }
+        );
+
+        return subject;
     }
 
     public Task<List<Subject>> GetAsync()
