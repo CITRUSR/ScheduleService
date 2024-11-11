@@ -26,4 +26,8 @@ public static class SubjectQueries
             WHERE id = @Id
             RETURNING *;
         ";
+    public static string GetSubjects =
+        @"
+            SELECT * FROM subjects
+        ";
 }

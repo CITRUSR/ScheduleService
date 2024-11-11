@@ -1,5 +1,8 @@
+using System.Text;
 using Dapper;
+using ScheduleService.Application.Common.Models;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.CQRS.SubjectEntity.Queries.GetSubjects;
 using ScheduleService.Domain.Entities;
 using ScheduleService.Infrastructure.Repositories.Sql;
 
@@ -21,9 +24,41 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         return subject;
     }
 
-    public Task<List<Subject>> GetAsync()
+    public async Task<List<Subject>> GetAsync(
+        SubjectFilter filter,
+        PaginationParameters paginationParameters
+    )
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var sqlBuilder = new StringBuilder();
+
+        sqlBuilder.Append(SubjectQueries.GetSubjects);
+
+        if (!string.IsNullOrWhiteSpace(filter.SearchString))
+        {
+            sqlBuilder.Append(
+                $" WHERE LOWER(CONCAT(name, abbreviation)) LIKE LOWER('%{filter.SearchString}%')"
+            );
+        }
+
+        string orderCol = filter.FilterBy switch
+        {
+            SubjectFilterState.Name => "name",
+            SubjectFilterState.Abbreviation => "abbreviation",
+        };
+
+        sqlBuilder.Append($" ORDER BY {orderCol} {filter.OrderState}");
+
+        sqlBuilder.Append($" LIMIT {paginationParameters.PageSize}");
+
+        sqlBuilder.Append(
+            $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
+        );
+
+        var subjects = await connection.QueryAsync<Subject>(sqlBuilder.ToString());
+
+        return [.. subjects];
     }
 
     public async Task<Subject?> GetByIdAsync(int id)
