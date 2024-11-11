@@ -45,8 +45,20 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         return subject;
     }
 
-    public Task<Subject?> UpdateAsync(Subject subject)
+    public async Task<Subject?> UpdateAsync(Subject subject)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var affectedRows = await connection.ExecuteAsync(
+            SubjectQueries.UpdateSubject,
+            new
+            {
+                subject.Name,
+                subject.Abbreviation,
+                subject.Id
+            }
+        );
+
+        return affectedRows == 1 ? subject : null;
     }
 }

@@ -13,4 +13,11 @@ public static class SubjectQueries
             SELECT * FROM subjects
             WHERE id = @Id;
         ";
+    public static string UpdateSubject =
+        @"
+            UPDATE subjects
+            SET name = @Name,
+            abbreviation = @Abbreviation
+            WHERE id = @Id;
+        ";
 }
