@@ -24,7 +24,7 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
         return room;
     }
 
-    public async Task<List<Room>> GetAsync(
+    public async Task<PagedList<Room>> GetAsync(
         RoomFilter filter,
         PaginationParameters paginationParameters
     )
@@ -37,10 +37,14 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 
         if (!string.IsNullOrWhiteSpace(filter.SearchString))
         {
-            queryBuilder.Append(
-                $"WHERE LOWER(CONCAT(name, full_name)) LIKE LOWER('%{filter.SearchString}%')"
-            );
+            queryBuilder.Append(@" WHERE LOWER(CONCAT(name, full_name)) LIKE LOWER(@SearchString)");
         }
+
+        var searchString = $"%{filter.SearchString}%";
+
+        var countQuery = queryBuilder
+            .ToString()
+            .Replace(RoomQueries.GetRooms, "SELECT COUNT(*) FROM rooms");
 
         string orderedCol = filter.FilterBy switch
         {
@@ -56,9 +60,22 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
             $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
         );
 
-        var rooms = await connection.QueryAsync<Room>(queryBuilder.ToString());
+        using var multy = await connection.QueryMultipleAsync(
+            $"{countQuery}; {queryBuilder};",
+            new { SearchString = searchString }
+        );
 
-        return [.. rooms];
+        var totalCountTask = multy.ReadSingleOrDefaultAsync<int>();
+        var roomsTask = multy.ReadAsync<Room>();
+
+        await Task.WhenAll(roomsTask, totalCountTask);
+
+        return new PagedList<Room>(
+            [.. await roomsTask],
+            await totalCountTask,
+            paginationParameters.Page,
+            paginationParameters.PageSize
+        );
     }
 
     public async Task<Room?> GetByIdAsync(int id)

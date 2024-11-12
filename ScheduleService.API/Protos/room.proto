@@ -57,4 +57,7 @@ message GetRoomsRequest {
   RoomFilter Filter = 1;
   PaginationParameters PaginationParameters = 2;
 }
-message GetRoomsResponse { repeated Room Rooms = 1; }
+message GetRoomsResponse {
+  repeated Room Rooms = 1;
+  int32 LastPage = 2;
+}

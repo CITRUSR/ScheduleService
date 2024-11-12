@@ -70,6 +70,10 @@ public class RoomService(IMediator mediator) : ScheduleService.RoomService.RoomS
 
         var rooms = await _mediator.Send(query);
 
-        return new GetRoomsResponse { Rooms = { rooms.Adapt<List<Room>>() } };
+        return new GetRoomsResponse
+        {
+            Rooms = { rooms.Items.Adapt<List<Room>>() },
+            LastPage = rooms.LastPage
+        };
     }
 }

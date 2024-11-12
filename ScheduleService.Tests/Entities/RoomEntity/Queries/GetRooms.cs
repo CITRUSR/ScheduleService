@@ -28,7 +28,7 @@ public class GetRooms
             .Setup(x =>
                 x.RoomRepository.GetAsync(It.IsAny<RoomFilter>(), It.IsAny<PaginationParameters>())
             )
-            .ReturnsAsync([.. rooms]);
+            .ReturnsAsync(new PagedList<Room>([.. rooms], 1, 1, 1));
 
         var handler = new GetRoomsQueryHandler(_mockUnitOfWork.Object);
         var query = _fixture.Create<GetRoomsQuery>();
@@ -41,6 +41,6 @@ public class GetRooms
             Times.Once()
         );
 
-        result.Should().HaveCount(10);
+        result.Items.Should().HaveCount(10);
     }
 }

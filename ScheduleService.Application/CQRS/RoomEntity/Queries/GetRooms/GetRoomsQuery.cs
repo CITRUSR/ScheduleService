@@ -5,4 +5,4 @@ using ScheduleService.Domain.Entities;
 namespace ScheduleService.Application.CQRS.RoomEntity.Queries.GetRooms;
 
 public record GetRoomsQuery(RoomFilter Filter, PaginationParameters PaginationParameters)
-    : IRequest<List<Room>>;
+    : IRequest<PagedList<Room>>;

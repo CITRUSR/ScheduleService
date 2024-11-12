@@ -8,7 +8,7 @@ public interface IRoomRepository
 {
     Task<Room> InsertAsync(Room room);
     Task<Room?> GetByIdAsync(int id);
-    Task<List<Room>> GetAsync(RoomFilter filter, PaginationParameters paginationParameters);
+    Task<PagedList<Room>> GetAsync(RoomFilter filter, PaginationParameters paginationParameters);
     Task<Room?> UpdateAsync(Room room);
     Task<Room?> DeleteAsync(int id);
 }
