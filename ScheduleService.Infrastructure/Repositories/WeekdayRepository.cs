@@ -1,5 +1,7 @@
+using Dapper;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
+using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
@@ -12,8 +14,15 @@ public class WeekdayRepository(IDbContext dbContext) : IWeekdayRepository
         throw new NotImplementedException();
     }
 
-    public Task<Weekday?> GetByIdAsync(int id)
+    public async Task<Weekday?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var weekday = await connection.QueryFirstOrDefaultAsync<Weekday>(
+            WeekdayQueries.GetWeekdayById,
+            new { id }
+        );
+
+        return weekday;
     }
 }
