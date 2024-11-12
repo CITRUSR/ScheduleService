@@ -70,6 +70,10 @@ public class SubjectService(IMediator mediator) : ScheduleService.SubjectService
 
         var subjects = await _mediator.Send(query);
 
-        return new GetSubjectsResponse() { Subjects = { subjects.Adapt<List<Subject>>() } };
+        return new GetSubjectsResponse()
+        {
+            Subjects = { subjects.Items.Adapt<List<Subject>>() },
+            LastPage = subjects.LastPage
+        };
     }
 }

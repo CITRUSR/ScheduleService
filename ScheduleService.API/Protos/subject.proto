@@ -58,4 +58,7 @@ message GetSubjctsRequest {
   SubjectFilter Filter = 1;
   PaginationParameters PaginationParameters = 2;
 }
-message GetSubjectsResponse { repeated Subject Subjects = 1; }
+message GetSubjectsResponse {
+  repeated Subject Subjects = 1;
+  int32 LastPage = 2;
+}

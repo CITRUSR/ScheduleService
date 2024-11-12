@@ -24,7 +24,7 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         return subject;
     }
 
-    public async Task<List<Subject>> GetAsync(
+    public async Task<PagedList<Subject>> GetAsync(
         SubjectFilter filter,
         PaginationParameters paginationParameters
     )
@@ -42,6 +42,10 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
             );
         }
 
+        var countQuery = sqlBuilder
+            .ToString()
+            .Replace(SubjectQueries.GetSubjects, "SELECT COUNT(*) FROM subjects");
+
         string orderCol = filter.FilterBy switch
         {
             SubjectFilterState.Name => "name",
@@ -56,9 +60,17 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
             $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
         );
 
-        var subjects = await connection.QueryAsync<Subject>(sqlBuilder.ToString());
+        using var multy = await connection.QueryMultipleAsync($"{countQuery}; {sqlBuilder};");
 
-        return [.. subjects];
+        var totalCount = await multy.ReadSingleOrDefaultAsync<int>();
+        var subjects = await multy.ReadAsync<Subject>();
+
+        return new PagedList<Subject>(
+            [.. subjects],
+            totalCount,
+            paginationParameters.Page,
+            paginationParameters.PageSize
+        );
     }
 
     public async Task<Subject?> GetByIdAsync(int id)

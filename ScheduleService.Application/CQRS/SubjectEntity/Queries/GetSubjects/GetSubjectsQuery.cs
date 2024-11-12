@@ -5,4 +5,4 @@ using ScheduleService.Domain.Entities;
 namespace ScheduleService.Application.CQRS.SubjectEntity.Queries.GetSubjects;
 
 public record GetSubjectsQuery(SubjectFilter Filter, PaginationParameters PaginationParameters)
-    : IRequest<List<Subject>>;
+    : IRequest<PagedList<Subject>>;
