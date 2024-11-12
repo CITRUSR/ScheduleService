@@ -24,7 +24,7 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         return subject;
     }
 
-    public async Task<List<Subject>> GetAsync(
+    public async Task<PagedList<Subject>> GetAsync(
         SubjectFilter filter,
         PaginationParameters paginationParameters
     )
@@ -38,9 +38,15 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         if (!string.IsNullOrWhiteSpace(filter.SearchString))
         {
             sqlBuilder.Append(
-                $" WHERE LOWER(CONCAT(name, abbreviation)) LIKE LOWER('%{filter.SearchString}%')"
+                $" WHERE LOWER(CONCAT(name, abbreviation)) LIKE LOWER(@SearchString)"
             );
         }
+
+        var searchString = $"%{filter.SearchString}%";
+
+        var countQuery = sqlBuilder
+            .ToString()
+            .Replace(SubjectQueries.GetSubjects, "SELECT COUNT(*) FROM subjects");
 
         string orderCol = filter.FilterBy switch
         {
@@ -56,9 +62,22 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
             $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
         );
 
-        var subjects = await connection.QueryAsync<Subject>(sqlBuilder.ToString());
+        using var multy = await connection.QueryMultipleAsync(
+            $"{countQuery}; {sqlBuilder};",
+            new { searchString }
+        );
 
-        return [.. subjects];
+        var totalCountTask = multy.ReadSingleOrDefaultAsync<int>();
+        var subjectsTask = multy.ReadAsync<Subject>();
+
+        await Task.WhenAll(totalCountTask, subjectsTask);
+
+        return new PagedList<Subject>(
+            [.. await subjectsTask],
+            await totalCountTask,
+            paginationParameters.Page,
+            paginationParameters.PageSize
+        );
     }
 
     public async Task<Subject?> GetByIdAsync(int id)

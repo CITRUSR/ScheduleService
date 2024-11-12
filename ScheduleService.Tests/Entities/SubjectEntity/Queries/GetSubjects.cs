@@ -29,7 +29,7 @@ public class GetSubjects
 
         _mockUnitOfWork
             .Setup(u => u.SubjectRepository.GetAsync(query.Filter, query.PaginationParameters))
-            .ReturnsAsync([.. subjects]);
+            .ReturnsAsync(new PagedList<Subject>([.. subjects], 1, 1, 1));
 
         var result = await handler.Handle(query, CancellationToken.None);
 
@@ -42,6 +42,6 @@ public class GetSubjects
             Times.Once()
         );
 
-        result.Should().HaveCount(10);
+        result.Items.Should().HaveCount(10);
     }
 }
