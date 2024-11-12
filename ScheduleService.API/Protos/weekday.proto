@@ -4,9 +4,14 @@ option csharp_namespace = "ScheduleService";
 
 package weekday;
 
-service WeekdayService {}
+service WeekdayService {
+  rpc GetWeekdayById(GetWeekdayByIdRequest) returns (GetWeekdayByIdResponse);
+}
 
 message Weekday {
   int32 Id = 1;
   string Name = 2;
 }
+
+message GetWeekdayByIdRequest { int32 Id = 1; }
+message GetWeekdayByIdResponse { Weekday Weekday = 1; }
