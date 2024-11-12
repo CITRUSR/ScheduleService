@@ -51,6 +51,13 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(subjectNotFoundEx.Message)
                         )
                     );
+                case WeekdayNotFoundException weekdayNotFoundEx:
+                    throw new RpcException(
+                        new Status(
+                            StatusCode.NotFound,
+                            JsonConvert.SerializeObject(weekdayNotFoundEx.Message)
+                        )
+                    );
                 case RoomNameAlreadyExistsException roomNameExistsEx:
                     throw new RpcException(
                         new Status(
