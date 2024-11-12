@@ -6,6 +6,7 @@ package weekday;
 
 service WeekdayService {
   rpc GetWeekdayById(GetWeekdayByIdRequest) returns (GetWeekdayByIdResponse);
+  rpc GetWeekdays(GetWeekdaysRequest) returns (GetWeekdaysResponse);
 }
 
 message Weekday {
@@ -15,3 +16,6 @@ message Weekday {
 
 message GetWeekdayByIdRequest { int32 Id = 1; }
 message GetWeekdayByIdResponse { Weekday Weekday = 1; }
+
+message GetWeekdaysRequest {}
+message GetWeekdaysResponse { repeated Weekday Weekdays = 1; }
