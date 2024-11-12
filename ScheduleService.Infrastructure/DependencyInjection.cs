@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IColorRepository, ColorRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
+        services.AddScoped<IWeekdayRepository, WeekdayRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
