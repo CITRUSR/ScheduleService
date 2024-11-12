@@ -37,7 +37,9 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 
         if (!string.IsNullOrWhiteSpace(filter.SearchString))
         {
-            queryBuilder.Append($"WHERE CONCAT(name, full_name) LIKE '%{filter.SearchString}%'");
+            queryBuilder.Append(
+                $"WHERE LOWER(CONCAT(name, full_name)) LIKE LOWER('%{filter.SearchString}%')"
+            );
         }
 
         string orderedCol = filter.FilterBy switch
