@@ -7,4 +7,8 @@ public static class WeekdayQueries
             SELECT * FROM weekdays
             WHERE id = @Id;
         ";
+    public static string GetAllWeekdays =
+        @"
+            SELECT * FROM weekdays
+        ";
 }

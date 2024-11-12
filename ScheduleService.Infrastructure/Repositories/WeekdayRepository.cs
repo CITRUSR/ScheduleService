@@ -9,9 +9,13 @@ public class WeekdayRepository(IDbContext dbContext) : IWeekdayRepository
 {
     private readonly IDbContext _dbContext = dbContext;
 
-    public Task<List<Weekday>> GetAllAsync()
+    public async Task<List<Weekday>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var weekdays = await connection.QueryAsync<Weekday>(WeekdayQueries.GetAllWeekdays);
+
+        return [.. weekdays];
     }
 
     public async Task<Weekday?> GetByIdAsync(int id)
