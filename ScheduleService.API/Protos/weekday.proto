@@ -5,3 +5,8 @@ option csharp_namespace = "ScheduleService";
 package weekday;
 
 service WeekdayService {}
+
+message Weekday {
+  int32 Id = 1;
+  string Name = 2;
+}
