@@ -34,5 +34,6 @@ app.UseHttpsRedirection();
 app.MapGrpcService<ColorService>();
 app.MapGrpcService<RoomService>();
 app.MapGrpcService<SubjectService>();
+app.MapGrpcService<WeekdayService>();
 
 await app.RunAsync();
