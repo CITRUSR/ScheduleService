@@ -37,25 +37,11 @@ public class ServerExceptionsInterceptor : Interceptor
                             JsonConvert.SerializeObject(notFoundEx.Message)
                         )
                     );
-                case RoomNameAlreadyExistsException roomNameExistsEx:
+                case AlreadyExistsException alreadyExistsEx:
                     throw new RpcException(
                         new Status(
                             StatusCode.AlreadyExists,
-                            JsonConvert.SerializeObject(roomNameExistsEx.Message)
-                        )
-                    );
-                case ColorNameAlreadyExistsException colorNameExistsEx:
-                    throw new RpcException(
-                        new Status(
-                            StatusCode.AlreadyExists,
-                            JsonConvert.SerializeObject(colorNameExistsEx.Message)
-                        )
-                    );
-                case SubjectNameAlreadyExistsException subjectNameExistsEx:
-                    throw new RpcException(
-                        new Status(
-                            StatusCode.AlreadyExists,
-                            JsonConvert.SerializeObject(subjectNameExistsEx.Message)
+                            JsonConvert.SerializeObject(alreadyExistsEx.Message)
                         )
                     );
                 default:
