@@ -4,4 +4,14 @@ option csharp_namespace = "ScheduleService";
 
 package CurrentWeekday;
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+
 service CurrentWeekdayService {}
+
+message CurrentWeekday {
+  int32 Id = 1;
+  string Color = 2;
+  google.protobuf.Duration Interval = 3;
+  google.protobuf.StringValue UpdatedAt = 4;
+}
