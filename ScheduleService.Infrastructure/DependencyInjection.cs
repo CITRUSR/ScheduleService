@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
         services.AddScoped<IWeekdayRepository, WeekdayRepository>();
+        services.AddScoped<ICurrentWeekdayRepository, CurrentWeekdayRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

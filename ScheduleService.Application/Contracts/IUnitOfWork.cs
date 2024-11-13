@@ -6,6 +6,7 @@ public interface IUnitOfWork
     IRoomRepository RoomRepository { get; }
     ISubjectRepository SubjectRepository { get; }
     IWeekdayRepository WeekdayRepository { get; }
+    ICurrentWeekdayRepository CurrentWeekdayRepository { get; }
     void CommitTransaction();
     void RollbackTransaction();
 }
