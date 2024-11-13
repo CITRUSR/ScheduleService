@@ -1,7 +1,7 @@
 namespace ScheduleService.Application.Common.Exceptions;
-public class ColorNotFoundException : Exception{
-    public ColorNotFoundException(int id) : base($"Color with id {id} not found.")
-    {
-        
-    }
+
+public class ColorNotFoundException : NotFoundException
+{
+    public ColorNotFoundException(int id)
+        : base($"color with id {id} not found") { }
 }
