@@ -1,39 +1,14 @@
-using ScheduleService.API.Interceptors;
-using ScheduleService.API.Services;
-using ScheduleService.Application;
-using ScheduleService.Infrastructure;
+using ScheduleService.API.extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddGrpc(options =>
-{
-    options.Interceptors.Add<ServerExceptionsInterceptor>();
-});
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-
-builder.Services.AddGrpc();
+builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.MapGrpcService<ColorService>();
-app.MapGrpcService<RoomService>();
-app.MapGrpcService<SubjectService>();
-app.MapGrpcService<WeekdayService>();
+app.ConfigureApplication();
 
 await app.RunAsync();
