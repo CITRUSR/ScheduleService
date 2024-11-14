@@ -7,7 +7,10 @@ package CurrentWeekday;
 import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
 
-service CurrentWeekdayService {}
+service CurrentWeekdayService {
+  rpc GetCurrentWeekday(GetCurrentWeekdayRequest)
+      returns (GetCurrentWeekdayResponse);
+}
 
 message CurrentWeekday {
   int32 Id = 1;
@@ -15,3 +18,7 @@ message CurrentWeekday {
   google.protobuf.Duration Interval = 3;
   google.protobuf.StringValue UpdatedAt = 4;
 }
+
+message GetCurrentWeekdayRequest {}
+
+message GetCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
