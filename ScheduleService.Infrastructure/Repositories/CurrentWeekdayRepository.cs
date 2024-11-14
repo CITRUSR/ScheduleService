@@ -20,9 +20,18 @@ public class CurrentWeekdayRepository(IDbContext dbContext) : ICurrentWeekdayRep
         return currentWeekday;
     }
 
-    public Task<CurrentWeekday> InsertAsync(CurrentWeekday currentWeekday)
+    public async Task<CurrentWeekday> InsertAsync(CurrentWeekday currentWeekday)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        int id = await connection.QuerySingleAsync<int>(
+            CurrentWeekdayQueries.InsertCurrentWeekday,
+            new { currentWeekday.Color, currentWeekday.Interval }
+        );
+
+        currentWeekday.Id = id;
+
+        return currentWeekday;
     }
 
     public Task<CurrentWeekday?> UpdateAsync(CurrentWeekday currentWeekday) { }
