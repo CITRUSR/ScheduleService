@@ -1,3 +1,5 @@
+using Hangfire;
+using ScheduleService.API.Filters;
 using ScheduleService.API.Interceptors;
 using ScheduleService.Application;
 using ScheduleService.Infrastructure;
@@ -29,6 +31,11 @@ public static class SturtupExtension
 
     public static void ConfigureApplication(this WebApplication app)
     {
+        app.UseHangfireDashboard(
+            "/hangfire",
+            new DashboardOptions { Authorization = [new DashBoardAuthorizationFilter()] }
+        );
+
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
