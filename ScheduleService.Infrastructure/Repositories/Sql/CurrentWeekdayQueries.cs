@@ -13,4 +13,12 @@ public static class CurrentWeekdayQueries
             VALUES (@Color, @Interval)
             RETURNING id;
         ";
+    public static string UpdateCurrentWeekday =
+        @"
+            UPDATE current_weekday
+            SET color = @Color,
+            interval = @Interval,
+            updated_at = @UpdatedAt
+            RETURNING id;
+        ";
 }
