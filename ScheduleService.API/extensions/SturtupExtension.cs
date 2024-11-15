@@ -19,6 +19,8 @@ public static class SturtupExtension
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
+        MapsterConfig.Configure();
+
         services.AddApplication();
         services.AddInfrastructure(configuration);
 
