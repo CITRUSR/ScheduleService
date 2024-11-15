@@ -6,10 +6,13 @@ package CurrentWeekday;
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
 
 service CurrentWeekdayService {
   rpc GetCurrentWeekday(GetCurrentWeekdayRequest)
       returns (GetCurrentWeekdayResponse);
+  rpc UpdateCurrentWeekday(UpdateCurrentWeekdayRequest)
+      returns (UpdateCurrentWeekdayResponse);
 }
 
 message CurrentWeekday {
@@ -22,3 +25,11 @@ message CurrentWeekday {
 message GetCurrentWeekdayRequest {}
 
 message GetCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
+
+message UpdateCurrentWeekdayRequest {
+  string Color = 1;
+  google.protobuf.Duration Interval = 2;
+  google.protobuf.Timestamp UpdateTime = 3;
+}
+
+message UpdateCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
