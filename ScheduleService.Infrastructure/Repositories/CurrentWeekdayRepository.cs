@@ -34,5 +34,27 @@ public class CurrentWeekdayRepository(IDbContext dbContext) : ICurrentWeekdayRep
         return currentWeekday;
     }
 
-    public Task<CurrentWeekday?> UpdateAsync(CurrentWeekday currentWeekday) { }
+    public async Task<CurrentWeekday?> UpdateAsync(CurrentWeekday currentWeekday)
+    {
+        using var connection = _dbContext.CreateConnection();
+
+        var id = await connection.QueryAsync<int>(
+            CurrentWeekdayQueries.UpdateCurrentWeekday,
+            new
+            {
+                currentWeekday.Color,
+                currentWeekday.Interval,
+                currentWeekday.UpdatedAt
+            }
+        );
+
+        if (!id.Any())
+        {
+            return null;
+        }
+
+        currentWeekday.Id = id.First();
+
+        return currentWeekday;
+    }
 }
