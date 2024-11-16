@@ -38,6 +38,8 @@ public static class DependencyInjection
                 .UsePostgreSqlStorage(connectionString)
         );
 
+        services.AddSingleton<IScheduleService, Services.ScheduleService>();
+
         services.AddScoped<IColorRepository, ColorRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
