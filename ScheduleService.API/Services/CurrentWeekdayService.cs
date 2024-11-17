@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Mapster;
 using MediatR;
+using ScheduleService.Application.CQRS.CurrentWeekdayEntity.Commands.CreateCurrentWeekday;
 using ScheduleService.Application.CQRS.CurrentWeekdayEntity.Commands.UpdateCurrentWeekday;
 using ScheduleService.Application.CQRS.CurrentWeekdayEntity.Queries.GetCurrentWeekday;
 
@@ -36,6 +37,21 @@ public class CurrentWeekdayService(IMediator mediator)
         var currentWeekday = await _mediator.Send(command);
 
         return new UpdateCurrentWeekdayResponse
+        {
+            CurrentWeekday = currentWeekday.Adapt<CurrentWeekday>()
+        };
+    }
+
+    public override async Task<CreateCurrentWeekdayResponse> CreateCurrentWeekday(
+        CreateCurrentWeekdayRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<CreateCurrentWeekdayCommand>();
+
+        var currentWeekday = await _mediator.Send(command);
+
+        return new CreateCurrentWeekdayResponse
         {
             CurrentWeekday = currentWeekday.Adapt<CurrentWeekday>()
         };
