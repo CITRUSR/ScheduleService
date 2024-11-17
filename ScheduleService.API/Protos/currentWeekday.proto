@@ -13,6 +13,8 @@ service CurrentWeekdayService {
       returns (GetCurrentWeekdayResponse);
   rpc UpdateCurrentWeekday(UpdateCurrentWeekdayRequest)
       returns (UpdateCurrentWeekdayResponse);
+  rpc CreateCurrentWeekday(CreateCurrentWeekdayRequest)
+      returns (CreateCurrentWeekdayResponse);
 }
 
 message CurrentWeekday {
@@ -33,3 +35,11 @@ message UpdateCurrentWeekdayRequest {
 }
 
 message UpdateCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
+
+message CreateCurrentWeekdayRequest {
+  string Color = 1;
+  google.protobuf.Duration Interval = 2;
+  google.protobuf.Timestamp UpdateTime = 3;
+}
+
+message CreateCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
