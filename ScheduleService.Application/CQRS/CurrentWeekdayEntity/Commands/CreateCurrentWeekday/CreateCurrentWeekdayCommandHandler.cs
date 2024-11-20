@@ -6,10 +6,11 @@ using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.CurrentWeekdayEntity.Commands.CreateCurrentWeekday;
 
-public class CreateCurrentWeekdayCommandHandler(IUnitOfWork unitOfWork)
+public class CreateCurrentWeekdayCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher)
     : IRequestHandler<CreateCurrentWeekdayCommand, CurrentWeekday>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IPublisher _publisher = publisher;
 
     public async Task<CurrentWeekday> Handle(
         CreateCurrentWeekdayCommand request,
@@ -30,6 +31,15 @@ public class CreateCurrentWeekdayCommandHandler(IUnitOfWork unitOfWork)
             );
 
             _unitOfWork.CommitTransaction();
+
+            await _publisher.Publish(
+                new CreateCurrentWeekdayEvent
+                {
+                    Color = request.Color,
+                    Interval = request.Interval,
+                    UpdateTime = request.UpdateTime
+                }
+            );
 
             return createdCurrentWeekday;
         }
