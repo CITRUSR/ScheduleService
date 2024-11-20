@@ -1,5 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
+using MediatR;
 using Moq;
 using Npgsql;
 using ScheduleService.Application.Common.Exceptions.CurrentWeekdayEntity;
@@ -13,6 +14,7 @@ public class CreateCurrentWeekday
 {
     private readonly Fixture _fixture;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IPublisher> _publisher;
     private readonly CreateCurrentWeekdayCommandHandler _handler;
     private readonly CreateCurrentWeekdayCommand _command;
 
@@ -20,7 +22,11 @@ public class CreateCurrentWeekday
     {
         _fixture = new Fixture();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _handler = new CreateCurrentWeekdayCommandHandler(_mockUnitOfWork.Object);
+        _publisher = new Mock<IPublisher>();
+        _handler = new CreateCurrentWeekdayCommandHandler(
+            _mockUnitOfWork.Object,
+            _publisher.Object
+        );
         _command = _fixture.Create<CreateCurrentWeekdayCommand>();
     }
 
@@ -39,6 +45,10 @@ public class CreateCurrentWeekday
         );
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
+        _publisher.Verify(
+            x => x.Publish(It.IsAny<CreateCurrentWeekdayEvent>(), It.IsAny<CancellationToken>()),
+            Times.Once()
+        );
 
         result.Should().NotBeNull();
     }
