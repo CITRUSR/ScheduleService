@@ -52,7 +52,8 @@ CREATE TABLE current_weekday (
     id SERIAL PRIMARY KEY,
     color VARCHAR(10) NOT NULL,
     interval INTERVAL NOT NULL,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    FOREIGN KEY (color) REFERENCES colors (name)
 );
 
 CREATE TABLE specialities_teachers_subjects (

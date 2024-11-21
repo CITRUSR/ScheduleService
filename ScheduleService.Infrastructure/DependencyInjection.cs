@@ -1,4 +1,6 @@
 using DbUp;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
@@ -27,10 +29,22 @@ public static class DependencyInjection
 
         upgrader.PerformUpgrade();
 
+        services.AddHangfireServer();
+        services.AddHangfire(config =>
+            config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(connectionString)
+        );
+
+        services.AddSingleton<IScheduleService, Services.ScheduleService>();
+
         services.AddScoped<IColorRepository, ColorRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
         services.AddScoped<IWeekdayRepository, WeekdayRepository>();
+        services.AddScoped<ICurrentWeekdayRepository, CurrentWeekdayRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

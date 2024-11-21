@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package CurrentWeekday;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+service CurrentWeekdayService {
+  rpc GetCurrentWeekday(GetCurrentWeekdayRequest)
+      returns (GetCurrentWeekdayResponse);
+  rpc UpdateCurrentWeekday(UpdateCurrentWeekdayRequest)
+      returns (UpdateCurrentWeekdayResponse);
+  rpc CreateCurrentWeekday(CreateCurrentWeekdayRequest)
+      returns (CreateCurrentWeekdayResponse);
+}
+
+message CurrentWeekday {
+  int32 Id = 1;
+  string Color = 2;
+  google.protobuf.Duration Interval = 3;
+  google.protobuf.StringValue UpdatedAt = 4;
+}
+
+message GetCurrentWeekdayRequest {}
+
+message GetCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
+
+message UpdateCurrentWeekdayRequest {
+  string Color = 1;
+  google.protobuf.Duration Interval = 2;
+  google.protobuf.Timestamp UpdateTime = 3;
+}
+
+message UpdateCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }
+
+message CreateCurrentWeekdayRequest {
+  string Color = 1;
+  google.protobuf.Duration Interval = 2;
+  google.protobuf.Timestamp UpdateTime = 3;
+}
+
+message CreateCurrentWeekdayResponse { CurrentWeekday CurrentWeekday = 1; }

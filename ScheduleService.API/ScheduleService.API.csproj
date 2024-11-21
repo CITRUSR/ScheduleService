@@ -8,10 +8,11 @@
 
   <ItemGroup>
     <Protobuf Include="Protos/color.proto" GrpcServices="Server, Client" />
-    <Protobuf Include="Protos/room.proto" GrpcServices = "Server, Client"/>
-    <Protobuf Include="Protos/subject.proto" GrpcServices = "Server, Client"/>
-    <Protobuf Include="Protos/weekday.proto" GrpcServices = "Server, Client"/>
-    <Protobuf Include="Protos/shared.proto" GrpcServices = "Server, Client"/>
+    <Protobuf Include="Protos/room.proto" GrpcServices="Server, Client" />
+    <Protobuf Include="Protos/subject.proto" GrpcServices="Server, Client" />
+    <Protobuf Include="Protos/weekday.proto" GrpcServices="Server, Client" />
+    <Protobuf Include="Protos/currentWeekday.proto" GrpcServices="Server, Client" />
+    <Protobuf Include="Protos/shared.proto" GrpcServices="Server, Client" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Hangfire" Version="1.8.15" />
     <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
     <PackageReference Include="Serilog" Version="4.1.0" />
