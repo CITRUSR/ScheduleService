@@ -1,5 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
+using MediatR;
 using Moq;
 using ScheduleService.Application.Common.Exceptions.CurrentWeekdayEntity;
 using ScheduleService.Application.Contracts;
@@ -13,13 +14,18 @@ public class UpdateCurrentWeekday
     private readonly Fixture _fixture;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly UpdateCurrentWeekdayCommandHandler _handler;
+    private readonly Mock<IPublisher> _mockPublisher;
     private readonly UpdateCurrentWeekdayCommand _command;
 
     public UpdateCurrentWeekday()
     {
         _fixture = new Fixture();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _handler = new UpdateCurrentWeekdayCommandHandler(_mockUnitOfWork.Object);
+        _mockPublisher = new Mock<IPublisher>();
+        _handler = new UpdateCurrentWeekdayCommandHandler(
+            _mockUnitOfWork.Object,
+            _mockPublisher.Object
+        );
         _command = _fixture.Build<UpdateCurrentWeekdayCommand>().With(x => x.Color, "Red").Create();
     }
 
@@ -38,6 +44,10 @@ public class UpdateCurrentWeekday
         );
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
+        _mockPublisher.Verify(
+            x => x.Publish(It.IsAny<UpdateCurrentWeekdayEvent>(), It.IsAny<CancellationToken>()),
+            Times.Once()
+        );
 
         result.Should().NotBeNull();
     }
