@@ -7,17 +7,30 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.35" />
+    <Protobuf Include="Services/UserService/Protos/group.proto" GrpcServices="Client" />
+    <Protobuf Include="Services/UserService/Protos/shared.proto" GrpcServices="Client" />
+    <Protobuf Include="Services/UserService/Protos/speciality.proto" GrpcServices="Client" />
+    <Protobuf Include="Services/UserService/Protos/student.proto" GrpcServices="Client" />
+    <Protobuf Include="Services/UserService/Protos/teacher.proto" GrpcServices="Client" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.44" />
     <PackageReference Include="dbup-postgresql" Version="5.0.40" />
     <PackageReference Include="FluentMigrator" Version="6.2.0" />
-    <PackageReference Include="Hangfire" Version="1.8.15" />
-    <PackageReference Include="Hangfire.Core" Version="1.8.15" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.67.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.68.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Hangfire" Version="1.8.17" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.17" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.0" />
-    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="Npgsql" Version="9.0.2" />
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
