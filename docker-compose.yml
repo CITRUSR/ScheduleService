@@ -8,6 +8,7 @@ services:
       dockerfile: ScheduleService.API/Dockerfile
     networks:
       - local
+      - global_network
     environment:
       - ASPNETCORE_HTTP_PORTS=8084
       - ASPNETCORE_HTTPS_PORTS=8085
@@ -37,6 +38,8 @@ services:
 networks:
   local:
     driver: bridge
+  global_network:
+    external: true
 volumes:
   posgres_data:
     driver: local
