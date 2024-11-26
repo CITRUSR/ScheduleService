@@ -4,7 +4,9 @@ using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.UserService.Speciality;
 using ScheduleService.Infrastructure.Repositories;
+using ScheduleService.Infrastructure.Services.UserService;
 
 namespace ScheduleService.Infrastructure;
 
@@ -39,6 +41,22 @@ public static class DependencyInjection
         );
 
         services.AddSingleton<IScheduleService, Services.ScheduleService>();
+
+        services
+            .AddGrpcClient<UserServiceClient.SpecialityService.SpecialityServiceClient>(options =>
+            {
+                options.Address = new Uri(configuration["Services:UserServiceUrl"]);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler();
+                handler.ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+                return handler;
+            });
+
+        services.AddSingleton<ISpecialityService, SpecialityService>();
 
         services.AddScoped<IColorRepository, ColorRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
