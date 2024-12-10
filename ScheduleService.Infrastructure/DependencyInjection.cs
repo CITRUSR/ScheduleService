@@ -1,9 +1,11 @@
 using DbUp;
+using Grpc.Core;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.UserService.Group;
 using ScheduleService.Application.Contracts.UserService.Speciality;
 using ScheduleService.Infrastructure.Repositories;
 using ScheduleService.Infrastructure.Services.UserService;
@@ -42,21 +44,25 @@ public static class DependencyInjection
 
         services.AddSingleton<IScheduleService, Services.ScheduleService>();
 
-        services
-            .AddGrpcClient<UserServiceClient.SpecialityService.SpecialityServiceClient>(options =>
-            {
-                options.Address = new Uri(configuration["Services:UserServiceUrl"]);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                var handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+        var userServiceUri = new Uri(configuration["Services:UserServiceUrl"]);
+        var handler = new HttpClientHandler();
+        handler.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-                return handler;
-            });
+        AddGrpcClient<UserServiceClient.SpecialityService.SpecialityServiceClient>(
+            services,
+            userServiceUri,
+            handler
+        );
+
+        AddGrpcClient<UserServiceClient.GroupService.GroupServiceClient>(
+            services,
+            userServiceUri,
+            handler
+        );
 
         services.AddSingleton<ISpecialityService, SpecialityService>();
+        services.AddSingleton<IGroupService, GroupService>();
 
         services.AddScoped<IColorRepository, ColorRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
@@ -67,5 +73,23 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
+    }
+
+    private static void AddGrpcClient<T>(
+        IServiceCollection services,
+        Uri uri,
+        HttpMessageHandler? handler
+    )
+        where T : ClientBase
+    {
+        services
+            .AddGrpcClient<T>(options =>
+            {
+                options.Address = uri;
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return handler ?? new HttpClientHandler();
+            });
     }
 }
