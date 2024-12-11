@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.Contracts.UserService.Group;
 using ScheduleService.Application.Contracts.UserService.Speciality;
+using ScheduleService.Application.Contracts.UserService.Teacher;
 using ScheduleService.Infrastructure.Repositories;
 using ScheduleService.Infrastructure.Services.UserService;
 
@@ -61,7 +62,14 @@ public static class DependencyInjection
             handler
         );
 
+        AddGrpcClient<UserServiceClient.TeacherService.TeacherServiceClient>(
+            services,
+            userServiceUri,
+            handler
+        );
+
         services.AddSingleton<ISpecialityService, SpecialityService>();
+        services.AddSingleton<ITeacherService, TeacherService>();
         services.AddSingleton<IGroupService, GroupService>();
 
         services.AddScoped<IColorRepository, ColorRepository>();
