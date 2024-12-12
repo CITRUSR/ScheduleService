@@ -23,9 +23,25 @@ public static class DependencyInjection
         services.AddSingleton<IDbContext, DbContext>();
 
         var connectionString = configuration.GetConnectionString("DbConnectionString");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("DbConnectionString is not configured.");
+        }
 
         EnsureDatabase.For.PostgresqlDatabase(connectionString);
+        PerformDatabaseUpgrade(connectionString);
 
+        ConfigureHangfire(services, connectionString);
+        services.AddSingleton<IScheduleService, Services.ScheduleService>();
+
+        AddUserService(services, configuration);
+        RegisterRepositories(services);
+
+        return services;
+    }
+
+    private static void PerformDatabaseUpgrade(string connectionString)
+    {
         var upgrader = DeployChanges
             .To.PostgresqlDatabase(connectionString)
             .WithScriptsEmbeddedInAssembly(typeof(DependencyInjection).Assembly)
@@ -33,7 +49,10 @@ public static class DependencyInjection
             .Build();
 
         upgrader.PerformUpgrade();
+    }
 
+    private static void ConfigureHangfire(IServiceCollection services, string connectionString)
+    {
         services.AddHangfireServer();
         services.AddHangfire(config =>
             config
@@ -42,45 +61,49 @@ public static class DependencyInjection
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(connectionString)
         );
+    }
 
-        services.AddSingleton<IScheduleService, Services.ScheduleService>();
+    private static void AddUserService(IServiceCollection services, IConfiguration configuration)
+    {
+        var userServiceUri = configuration["Services:UserServiceUrl"];
 
-        var userServiceUri = new Uri(configuration["Services:UserServiceUrl"]);
+        if (string.IsNullOrEmpty(userServiceUri))
+        {
+            throw new InvalidOperationException("User ServiceUrl is not configured.");
+        }
+
+        var uri = new Uri(userServiceUri);
         var handler = new HttpClientHandler();
         handler.ServerCertificateCustomValidationCallback =
             HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
         AddGrpcClient<UserServiceClient.SpecialityService.SpecialityServiceClient>(
             services,
-            userServiceUri,
+            uri,
             handler
         );
 
-        AddGrpcClient<UserServiceClient.GroupService.GroupServiceClient>(
-            services,
-            userServiceUri,
-            handler
-        );
+        AddGrpcClient<UserServiceClient.GroupService.GroupServiceClient>(services, uri, handler);
 
         AddGrpcClient<UserServiceClient.TeacherService.TeacherServiceClient>(
             services,
-            userServiceUri,
+            uri,
             handler
         );
 
         services.AddSingleton<ISpecialityService, SpecialityService>();
         services.AddSingleton<ITeacherService, TeacherService>();
         services.AddSingleton<IGroupService, GroupService>();
+    }
 
+    private static void RegisterRepositories(IServiceCollection services)
+    {
         services.AddScoped<IColorRepository, ColorRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<ISubjectRepository, SubjectRepository>();
         services.AddScoped<IWeekdayRepository, WeekdayRepository>();
         services.AddScoped<ICurrentWeekdayRepository, CurrentWeekdayRepository>();
-
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        return services;
     }
 
     private static void AddGrpcClient<T>(
