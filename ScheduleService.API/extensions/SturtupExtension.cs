@@ -49,5 +49,6 @@ public static class SturtupExtension
         app.MapGrpcService<Services.SubjectService>();
         app.MapGrpcService<Services.WeekdayService>();
         app.MapGrpcService<Services.CurrentWeekdayService>();
+        app.MapGrpcService<Services.ClassService>();
     }
 }
