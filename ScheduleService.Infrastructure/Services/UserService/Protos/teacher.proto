@@ -1,0 +1,109 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "UserServiceClient";
+
+package Teacher;
+
+import "google/protobuf/wrappers.proto";
+import "Services/UserService/Protos/shared.proto";
+
+service TeacherService {
+  rpc GetTeachers(GetTeachersRequest) returns (GetTeachersResponse);
+  rpc GetTeacherById(GetTeacherByIdRequest) returns (TeacherModel);
+  rpc GetTeacherBySsoId(GetTeacherBySsoIdRequest) returns (TeacherModel);
+  rpc CreateTeacher(CreateTeacherRequest) returns (TeacherShortInfo);
+  rpc DeleteTeachers(DeleteTeachersRequest) returns (DeleteTeachersResponse);
+  rpc SoftDeleteTeachers(SoftDeleteTeachersRequest)
+      returns (SoftDeleteTeachersResponse);
+  rpc RecoveryTeachers(RecoveryTeachersRequest)
+      returns (RecoveryTeachersResponse);
+  rpc EditTeacher(EditTeacherRequest) returns (TeacherShortInfo);
+  rpc FireTeachers(FireTeachersRequest) returns (FireTeachersResponse);
+}
+
+// FiredAt is the date
+message TeacherModel {
+  string Id = 1;
+  string SsoId = 2;
+  string FirstName = 3;
+  string LastName = 4;
+  google.protobuf.StringValue PatronymicName = 5;
+  int32 RoomId = 6;
+  google.protobuf.StringValue FiredAt = 7;
+  bool IsDeleted = 8;
+}
+
+message TeacherShortInfo {
+  string Id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+}
+
+message TeacherViewModel {
+  string Id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  google.protobuf.StringValue Group = 4;
+  int32 RoomNumber = 5;
+}
+
+message GetTeachersRequest {
+  google.protobuf.StringValue SearchString = 1;
+  int32 Page = 2;
+  int32 PageSize = 3;
+  TeacherSortState SortState = 4;
+  DeletedStatus DeletedStatus = 5;
+}
+
+message GetTeachersResponse {
+  repeated TeacherViewModel Teachers = 1;
+  int32 LastPage = 2;
+}
+
+enum TeacherSortState {
+  FirstNameAsc = 0;
+  FirstNameDesc = 1;
+  LastNameAsc = 2;
+  LastNameDesc = 3;
+}
+
+message CreateTeacherRequest {
+  string SsoId = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  google.protobuf.StringValue PatronymicName = 4;
+  int32 RoomId = 5;
+}
+
+message GetTeacherByIdRequest { string Id = 1; }
+
+message GetTeacherBySsoIdRequest { string SsoId = 1; }
+
+message DeleteTeachersRequest { repeated string Ids = 1; }
+
+message DeleteTeachersResponse { repeated TeacherShortInfo Teachers = 1; }
+
+message SoftDeleteTeachersRequest { repeated string Ids = 1; }
+
+message SoftDeleteTeachersResponse { repeated TeacherShortInfo Teachers = 1; }
+
+message RecoveryTeachersRequest { repeated string Ids = 1; }
+
+message RecoveryTeachersResponse { repeated TeacherShortInfo Teachers = 1; }
+
+message EditTeacherRequest {
+  string Id = 1;
+  string FirstName = 3;
+  string LastName = 4;
+  google.protobuf.StringValue PatronymicName = 5;
+  int32 RoomId = 6;
+  string FiredAt = 7;
+  bool IsDeleted = 8;
+}
+
+message FireTeachersRequest {
+  repeated string Ids = 1;
+  string FiredTime = 2;
+}
+
+message FireTeachersResponse { repeated TeacherShortInfo Teachers = 1; }
