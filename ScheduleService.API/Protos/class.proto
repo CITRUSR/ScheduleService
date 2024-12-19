@@ -8,7 +8,9 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/duration.proto";
 import "Protos/room.proto";
 
-service ClassService {}
+service ClassService {
+  rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
+}
 
 message Class {
   int32 Id = 1;
@@ -19,6 +21,21 @@ message Class {
   google.protobuf.Duration StartsAt = 6;
   google.protobuf.Duration EndsAt = 7;
   google.protobuf.StringValue ChangeOn = 8;
+  google.protobuf.StringValue IrrelevantSince = 9;
   repeated string TeacherIds = 10;
   repeated room.Room Rooms = 11;
 }
+
+message CreateClassRequest {
+  int32 GroupId = 2;
+  int32 SubjectId = 3;
+  int32 WeekdayId = 4;
+  google.protobuf.Int32Value ColorId = 5;
+  google.protobuf.Duration StartsAt = 6;
+  google.protobuf.Duration EndsAt = 7;
+  google.protobuf.StringValue ChangeOn = 8;
+  repeated string TeacherIds = 10;
+  repeated int32 RoomIds = 11;
+}
+
+message CreateClassResponse { Class Class = 1; }
