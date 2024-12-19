@@ -10,7 +10,7 @@ public static class ColorQueries
     public static string GetColorById =
         @"
             SELECT * FROM colors
-            WHERE id = @Id;
+            WHERE id = @ColorId;
         ";
     public static string UpdateColor =
         @"
