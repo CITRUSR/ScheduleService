@@ -11,7 +11,7 @@ public static class SubjectQueries
     public static string GetSubjectById =
         @"
             SELECT * FROM subjects
-            WHERE id = @Id;
+            WHERE id = @SubjectId;
         ";
     public static string UpdateSubject =
         @"
