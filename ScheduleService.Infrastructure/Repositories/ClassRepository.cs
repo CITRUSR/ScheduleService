@@ -1,5 +1,9 @@
+using Dapper;
+using Newtonsoft.Json;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Domain.Entities;
+using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
@@ -22,9 +26,69 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         throw new NotImplementedException();
     }
 
-    public async Task<Class> InsertAsync(Class @class)
+    public async Task<Class> InsertAsync(CreateClassDto dto)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("GroupFk", dto.GroupId);
+        parameters.Add("SubjectFk", dto.SubjectId);
+        parameters.Add("WeekdayFk", dto.WeekdayId);
+        parameters.Add("ColorFk", dto.ColorId);
+        parameters.Add("StartsAt", dto.StartsAt);
+        parameters.Add("EndsAt", dto.EndsAt);
+        parameters.Add("ChangeOn", dto.ChangeOn);
+
+        var classes = await connection.QueryAsync<Class, Subject, Weekday, string, string, Class>(
+            string.Format(
+                ClassQueries.InsertClass,
+                string.Join(", ", dto.TeacherIds.Select(guid => $"'{guid}'::uuid")),
+                string.Join(", ", dto.RoomIds)
+            ),
+            (@cl, subject, weekday, teacherIds, rooms) =>
+            {
+                @cl.Subject = subject;
+                @cl.Weekday = weekday;
+                @cl.TeacherIds = JsonConvert.DeserializeObject<List<Guid>>(teacherIds);
+                @cl.Rooms = JsonConvert.DeserializeObject<List<Room>>(rooms);
+                return @cl;
+            },
+            parameters,
+            splitOn: "subjectId, weekdayId, teachers, rooms"
+        );
+
+        var @class = classes.FirstOrDefault();
+
+        return @class;
+    }
+
+    public async Task<ClassCreationDto> GetEntitiesForInsertClassAsync(CreateClassDto dto)
+    {
+        using var connection = _dbContext.CreateConnection();
+
+        DynamicParameters parameters = new DynamicParameters();
+        parameters.Add("ColorId", dto.ColorId);
+        parameters.Add("SubjectId", dto.SubjectId);
+        parameters.Add("WeekdayId", dto.WeekdayId);
+
+        using var multy = await connection.QueryMultipleAsync(
+            $@"
+            {(dto.ColorId != null ? ColorQueries.GetColorById : "")};
+            {SubjectQueries.GetSubjectById};
+            {WeekdayQueries.GetWeekdayById};
+            {string.Format(RoomQueries.GetRoomsById, string.Join(",", dto.RoomIds))};",
+            parameters
+        );
+
+        var colorTask = dto.ColorId != null ? await multy.ReadSingleAsync<Color>() : null;
+
+        var subjectTask = await multy.ReadSingleAsync<Subject>();
+
+        var weekdayTask = await multy.ReadSingleAsync<Weekday>();
+
+        var roomsCountTask = await multy.ReadAsync<Room>();
+
+        return new ClassCreationDto(colorTask, subjectTask, weekdayTask, [.. roomsCountTask]);
     }
 
     public Task<Class?> UpdateAsync(Class @class)
