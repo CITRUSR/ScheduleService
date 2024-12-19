@@ -4,9 +4,8 @@ public class Class
 {
     public int Id { get; set; }
     public int GroupId { get; set; }
-    public int SubjectId { get; set; }
-    public int WeekdayId { get; set; }
-    public int? ColorId { get; set; }
+    public Subject Subject { get; set; }
+    public Weekday Weekday { get; set; }
     public TimeSpan StartsAt { get; set; }
     public TimeSpan EndsAt { get; set; }
     public DateTime? ChangeOn { get; set; }
