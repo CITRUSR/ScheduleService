@@ -30,4 +30,10 @@ public class RoomQueries
         @"
             SELECT * FROM rooms
         ";
+
+    public static string GetRoomsById =
+        @"
+            SELECT * FROM rooms
+            WHERE id IN ({0})
+        ";
 }
