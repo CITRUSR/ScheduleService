@@ -13,6 +13,7 @@ import "Protos/color.proto";
 
 service ClassService {
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
+  rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse);
 }
 
 message Class {
@@ -42,3 +43,18 @@ message CreateClassRequest {
 }
 
 message CreateClassResponse { Class Class = 1; }
+
+message UpdateClassRequest {
+  int32 ClassId = 1;
+  int32 GroupId = 2;
+  int32 SubjectId = 3;
+  int32 WeekdayId = 4;
+  google.protobuf.Int32Value ColorId = 5;
+  google.protobuf.Duration StartsAt = 6;
+  google.protobuf.Duration EndsAt = 7;
+  google.protobuf.StringValue ChangeOn = 8;
+  repeated string TeacherIds = 10;
+  repeated int32 RoomIds = 11;
+}
+
+message UpdateClassResponse { Class Class = 1; }

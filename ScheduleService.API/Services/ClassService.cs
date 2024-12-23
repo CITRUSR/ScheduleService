@@ -2,6 +2,7 @@ using Grpc.Core;
 using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
+using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 
 namespace ScheduleService.API.Services;
 
@@ -19,5 +20,17 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
         var @class = await _mediator.Send(command);
 
         return new CreateClassResponse { Class = @class.Adapt<Class>() };
+    }
+
+    public override async Task<UpdateClassResponse> UpdateClass(
+        UpdateClassRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<UpdateClassCommand>();
+
+        var @class = await _mediator.Send(command);
+
+        return new UpdateClassResponse { Class = @class.Adapt<Class>() };
     }
 }

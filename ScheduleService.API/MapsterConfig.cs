@@ -25,6 +25,18 @@ public static class MapsterConfig
 
     private static void ConfigureClassRequests()
     {
+        TypeAdapterConfig<CreateClassRequest, CreateClassCommand>
+            .NewConfig()
+            .Map(dest => dest.StartsAt, src => src.StartsAt.ToTimeSpan())
+            .Map(dest => dest.EndsAt, src => src.EndsAt.ToTimeSpan())
+            .Map(dest => dest.TeachersIds, src => src.TeacherIds);
+
+        TypeAdapterConfig<UpdateClassRequest, UpdateClassCommand>
+            .NewConfig()
+            .Map(dest => dest.StartsAt, src => src.StartsAt.ToTimeSpan())
+            .Map(dest => dest.EndsAt, src => src.EndsAt.ToTimeSpan())
+            .Map(dest => dest.TeacherIds, src => src.TeacherIds);
+
         TypeAdapterConfig<UpdateClassCommand, UpdateClassDto>
             .NewConfig()
             .Map(dest => dest.Id, src => src.ClassId);
