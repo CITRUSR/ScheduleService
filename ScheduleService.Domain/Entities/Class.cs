@@ -6,6 +6,7 @@ public class Class
     public int GroupId { get; set; }
     public Subject Subject { get; set; }
     public Weekday Weekday { get; set; }
+    public Color? Color { get; set; }
     public TimeSpan StartsAt { get; set; }
     public TimeSpan EndsAt { get; set; }
     public DateTime? ChangeOn { get; set; }
