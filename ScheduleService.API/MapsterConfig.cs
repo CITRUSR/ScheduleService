@@ -2,6 +2,7 @@ using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using Mapster;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
+using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Application.CQRS.CurrentWeekdayEntity.Commands.CreateCurrentWeekday;
 using ScheduleService.Application.CQRS.CurrentWeekdayEntity.Commands.UpdateCurrentWeekday;
 
@@ -24,11 +25,9 @@ public static class MapsterConfig
 
     private static void ConfigureClassRequests()
     {
-        TypeAdapterConfig<CreateClassRequest, CreateClassCommand>
+        TypeAdapterConfig<UpdateClassCommand, UpdateClassDto>
             .NewConfig()
-            .Map(dest => dest.StartsAt, src => src.StartsAt.ToTimeSpan())
-            .Map(dest => dest.EndsAt, src => src.EndsAt.ToTimeSpan())
-            .Map(dest => dest.TeachersIds, src => src.TeacherIds);
+            .Map(dest => dest.Id, src => src.ClassId);
     }
 
     private static void ConfigureCurrentWeekdayRequests()
