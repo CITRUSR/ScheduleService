@@ -87,4 +87,100 @@ public static class ClassQueries
                      inserted.StartsAt,
                      inserted.ChangeOn;
         ";
+
+    public static readonly string UpdateClass =
+        @"
+            DELETE FROM teachers_classes
+            WHERE class_fk = @ClassId AND
+            teacher_fk NOT IN (SELECT unnest(ARRAY[{0}]));
+
+            DELETE FROM classes_rooms
+            WHERE class_fk = @ClassId AND
+            room_fk NOT IN (SELECT unnest(ARRAY[{1}]));
+
+            INSERT INTO teachers_classes (class_fk, teacher_fk)
+            SELECT @ClassId, t.teacher_fk
+            FROM (SELECT unnest(ARRAY[{0}]) AS teacher_fk) AS t
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM teachers_classes
+                WHERE class_fk = @ClassId AND
+                teacher_fk = t.teacher_fk
+            );
+
+            INSERT INTO classes_rooms (class_fk, room_fk)
+            SELECT @ClassId, r.room_fk
+            FROM (
+                SELECT unnest(ARRAY[{1}]) as room_fk
+            ) AS r
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM classes_rooms
+                WHERE class_fk = @ClassId AND
+                room_fk = r.room_fk
+            );
+
+            WITH updatedClass AS(
+                UPDATE classes
+                SET group_fk = @GroupFk,
+                    subject_fk = @SubjectFk,
+                    weekday_fk = @WeekdayFk,
+                    color_fk = @ColorFk,
+                    starts_at = @StartsAt,
+                    ends_at = @EndsAt,
+                    change_on = @ChangeOn
+                WHERE id = @ClassId
+                RETURNING
+                id,
+                group_fk AS GroupId,
+                subject_fk AS SubjectId,
+                weekday_fk AS WeekdayId,
+                color_fk AS ColorId,
+                ends_at AS EndsAt,
+                starts_at AS StartsAt,
+                change_on AS ChangeOn
+            )
+
+            SELECT
+                updatedClass.id,
+                updatedClass.GroupId,
+                updatedClass.EndsAt,
+                updatedClass.StartsAt,
+                updatedClass.ChangeOn,
+                subjects.id,
+                subjects.name,
+                subjects.abbreviation,
+                weekdays.id,
+                weekdays.name,
+                colors.id,
+                colors.name,
+                JSON_AGG(teachers_classes.teacher_fk) AS teachersIds,
+                JSON_AGG(rooms) AS rooms
+            FROM updatedClass
+            JOIN
+                subjects ON subjects.id = updatedClass.SubjectId
+            JOIN
+                weekdays ON weekdays.id = updatedClass.WeekdayId
+            JOIN
+                teachers_classes ON teachers_classes.class_fk = updatedClass.id
+            JOIN
+                classes_rooms ON classes_rooms.class_fk = updatedClass.id
+            JOIN
+                rooms ON rooms.id = classes_rooms.room_fk
+            LEFT JOIN
+                colors ON colors.id = updatedClass.ColorId
+            GROUP BY
+                updatedClass.id,
+                updatedClass.GroupId,
+                updatedClass.EndsAt,
+                updatedClass.StartsAt,
+                updatedClass.ChangeOn,
+                subjects.id,
+                subjects.name,
+                subjects.abbreviation,
+                weekdays.id,
+                weekdays.name,
+                colors.id,
+                colors.name;
+                ";
 }

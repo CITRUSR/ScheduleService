@@ -93,8 +93,50 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         return new ClassDependenciesDto(colorTask, subjectTask, weekdayTask, [.. roomsCountTask]);
     }
 
-    public async Task<Class?> UpdateAsync(Class @class)
+    public async Task<Class?> UpdateAsync(UpdateClassDto dto)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ClassId", dto.Id);
+        parameters.Add("GroupFk", dto.GroupId);
+        parameters.Add("ColorFk", dto.ColorId);
+        parameters.Add("SubjectFK", dto.SubjectId);
+        parameters.Add("WeekdayFk", dto.WeekdayId);
+        parameters.Add("StartsAt", dto.StartsAt);
+        parameters.Add("EndsAt", dto.EndsAt);
+        parameters.Add("ChangeOn", dto.ChangeOn);
+
+        var classes = await connection.QueryAsync<
+            Class,
+            Subject,
+            Weekday,
+            Color?,
+            string,
+            string,
+            Class
+        >(
+            string.Format(
+                ClassQueries.UpdateClass,
+                string.Join(", ", dto.TeacherIds.Select(x => $"'{x}'::uuid")),
+                string.Join(", ", dto.RoomIds)
+            ),
+            (@cl, subject, weekday, color, teacherIds, rooms) =>
+            {
+                @cl.Subject = subject;
+                @cl.Weekday = weekday;
+                @cl.Color = color;
+                @cl.TeacherIds = JsonConvert.DeserializeObject<List<Guid>>(teacherIds);
+                @cl.Rooms = JsonConvert.DeserializeObject<List<Room>>(rooms);
+
+                return @cl;
+            },
+            parameters,
+            splitOn: "id, id, id, teachersids, rooms"
+        );
+
+        var @class = classes.FirstOrDefault();
+
+        return @class;
     }
 }
