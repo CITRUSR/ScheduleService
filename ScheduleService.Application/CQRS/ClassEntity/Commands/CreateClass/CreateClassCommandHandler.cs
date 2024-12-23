@@ -33,7 +33,15 @@ public class CreateClassCommandHandler(
             request.RoomIds
         );
 
-        var req = await _unitOfWork.ClassRepository.GetEntitiesForInsertClassAsync(dto);
+        GetClassDependenciesDto dependnceDto = new GetClassDependenciesDto(
+            request.GroupId,
+            request.SubjectId,
+            request.WeekdayId,
+            request.ColorId,
+            request.RoomIds
+        );
+
+        var req = await _unitOfWork.ClassRepository.GetClassDependencies(dependnceDto);
 
         if (req.Color == null && request.ColorId.HasValue)
             throw new ColorNotFoundException(request.ColorId.Value);

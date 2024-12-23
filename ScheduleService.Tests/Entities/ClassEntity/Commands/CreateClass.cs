@@ -8,6 +8,7 @@ using ScheduleService.Application.Contracts.UserService.Group;
 using ScheduleService.Application.Contracts.UserService.Group.Dto.Responses;
 using ScheduleService.Application.Contracts.UserService.Teacher;
 using ScheduleService.Application.Contracts.UserService.Teacher.dto.responses;
+using ScheduleService.Application.CQRS.ClassEntity;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Domain.Entities;
 
@@ -39,9 +40,9 @@ public class CreateClass
     [Fact]
     public async Task CreateClass_ShouldBe_Success()
     {
-        var classCreationDto = _fixture.Create<ClassCreationDto>();
+        var ClassDependenciesDto = _fixture.Create<ClassDependenciesDto>();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         _mockTeacherService
             .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
@@ -56,7 +57,7 @@ public class CreateClass
         var result = await _handler.Handle(_command, default);
 
         _mockUnitOfWork.Verify(
-            x => x.ClassRepository.GetEntitiesForInsertClassAsync(It.IsAny<CreateClassDto>()),
+            x => x.ClassRepository.GetClassDependencies(It.IsAny<GetClassDependenciesDto>()),
             Times.Once()
         );
 
@@ -80,12 +81,12 @@ public class CreateClass
     [Fact]
     public async Task CreateClass_ShouldBe_ColorNotFoundException()
     {
-        var classCreationDto = _fixture
-            .Build<ClassCreationDto>()
+        var ClassDependenciesDto = _fixture
+            .Build<ClassDependenciesDto>()
             .With(x => x.Color, (Color?)null)
             .Create();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
@@ -95,12 +96,12 @@ public class CreateClass
     [Fact]
     public async Task CreateClass_ShouldBe_SubjectNotFoundException()
     {
-        var classCreationDto = _fixture
-            .Build<ClassCreationDto>()
+        var ClassDependenciesDto = _fixture
+            .Build<ClassDependenciesDto>()
             .With(x => x.Subject, (Subject?)null)
             .Create();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
@@ -110,12 +111,12 @@ public class CreateClass
     [Fact]
     public async Task CreateClass_ShouldBe_WeekdayNotFoundException()
     {
-        var classCreationDto = _fixture
-            .Build<ClassCreationDto>()
+        var ClassDependenciesDto = _fixture
+            .Build<ClassDependenciesDto>()
             .With(x => x.Weekday, (Weekday?)null)
             .Create();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
@@ -127,12 +128,12 @@ public class CreateClass
     {
         var rooms = _fixture.CreateMany<Room>(5);
 
-        var classCreationDto = _fixture
-            .Build<ClassCreationDto>()
+        var ClassDependenciesDto = _fixture
+            .Build<ClassDependenciesDto>()
             .With(x => x.Rooms, [.. rooms])
             .Create();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         Func<Task> act = async () =>
             await _handler.Handle(
@@ -149,9 +150,9 @@ public class CreateClass
     [Fact]
     public async Task CreateClass_ShouldBe_TeachersNotFoundException()
     {
-        var classCreationDto = _fixture.Create<ClassCreationDto>();
+        var ClassDependenciesDto = _fixture.Create<ClassDependenciesDto>();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         _mockTeacherService
             .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
@@ -165,9 +166,9 @@ public class CreateClass
     [Fact]
     public async Task CreateClass_ShouldBe_GroupNotFoundException()
     {
-        var classCreationDto = _fixture.Create<ClassCreationDto>();
+        var ClassDependenciesDto = _fixture.Create<ClassDependenciesDto>();
 
-        SetupGetEntitiesForInsertClassAsync(classCreationDto);
+        SetupGetClassDependencies(ClassDependenciesDto);
 
         _mockTeacherService
             .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
@@ -182,12 +183,10 @@ public class CreateClass
         await act.Should().ThrowAsync<RpcException>();
     }
 
-    private void SetupGetEntitiesForInsertClassAsync(ClassCreationDto dto)
+    private void SetupGetClassDependencies(ClassDependenciesDto dto)
     {
         _mockUnitOfWork
-            .Setup(x =>
-                x.ClassRepository.GetEntitiesForInsertClassAsync(It.IsAny<CreateClassDto>())
-            )
+            .Setup(x => x.ClassRepository.GetClassDependencies(It.IsAny<GetClassDependenciesDto>()))
             .ReturnsAsync(dto);
     }
 }
