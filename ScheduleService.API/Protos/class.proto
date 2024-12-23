@@ -7,6 +7,9 @@ package class;
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/duration.proto";
 import "Protos/room.proto";
+import "Protos/subject.proto";
+import "Protos/weekday.proto";
+import "Protos/color.proto";
 
 service ClassService {
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
@@ -15,9 +18,9 @@ service ClassService {
 message Class {
   int32 Id = 1;
   int32 GroupId = 2;
-  int32 SubjectId = 3;
-  int32 WeekdayId = 4;
-  google.protobuf.Int32Value ColorId = 5;
+  subject.Subject Subject = 3;
+  weekday.Weekday Weekday = 4;
+  color.Color Color = 5;
   google.protobuf.Duration StartsAt = 6;
   google.protobuf.Duration EndsAt = 7;
   google.protobuf.StringValue ChangeOn = 8;
