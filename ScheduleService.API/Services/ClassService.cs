@@ -2,6 +2,7 @@ using Grpc.Core;
 using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
+using ScheduleService.Application.CQRS.ClassEntity.Commands.DeleteClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClassById;
 
@@ -45,5 +46,17 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
         var @class = await _mediator.Send(query);
 
         return new GetClassByIdResponse { Class = @class.Adapt<Class>() };
+    }
+
+    public override async Task<DeleteClassResponse> DeleteClass(
+        DeleteClassRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<DeleteClassCommand>();
+
+        var @class = await _mediator.Send(command);
+
+        return new DeleteClassResponse { Class = @class.Adapt<Class>() };
     }
 }
