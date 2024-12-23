@@ -23,9 +23,40 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         throw new NotImplementedException();
     }
 
-    public Task<Class?> GetByIdAsync(int id)
+    public async Task<Class?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var parameters = new DynamicParameters();
+
+        parameters.Add("ClassId", id);
+
+        var classes = await connection.QueryAsync<
+            Class,
+            Subject,
+            Weekday,
+            Color?,
+            string,
+            string,
+            Class
+        >(
+            ClassQueries.GetClassById,
+            (cl, subject, weekday, color, teacherIds, rooms) =>
+            {
+                cl.Subject = subject;
+                cl.Weekday = weekday;
+                cl.Color = color;
+                cl.TeacherIds = JsonConvert.DeserializeObject<List<Guid>>(teacherIds);
+                cl.Rooms = JsonConvert.DeserializeObject<List<Room>>(rooms);
+                return cl;
+            },
+            parameters,
+            splitOn: "id, id, id, TeachersIds, rooms"
+        );
+
+        var @class = classes.FirstOrDefault();
+
+        return @class;
     }
 
     public async Task<Class> InsertAsync(CreateClassDto dto)

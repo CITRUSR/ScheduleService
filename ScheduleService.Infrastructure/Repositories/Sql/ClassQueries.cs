@@ -183,4 +183,51 @@ public static class ClassQueries
                 colors.id,
                 colors.name;
                 ";
+    public static readonly string GetClassById =
+        @"
+            SELECT
+                classes.id,
+                classes.group_fk AS GroupId,
+                classes.ends_at AS EndsAt,
+                classes.starts_at AS StartsAt,
+                classes.change_on AS ChangeOn,
+                classes.irrelevant_since AS IrrelevantSince,
+                subjects.id,
+                subjects.name,
+                subjects.abbreviation,
+                weekdays.id,
+                weekdays.name,
+                colors.id,
+                colors.name,
+                JSON_AGG(teachers_classes.teacher_fk) AS TeachersIds,
+                JSON_AGG(rooms) AS rooms
+            FROM classes
+            JOIN
+                subjects ON subjects.id = classes.subject_fk
+            JOIN
+                weekdays ON weekdays.id = classes.weekday_fk
+            JOIN
+                teachers_classes ON teachers_classes.class_fk = @ClassId
+            JOIN 
+                classes_rooms ON classes_rooms.class_fk = @ClassId
+            JOIN
+                rooms ON rooms.id = classes_rooms.room_fk
+            LEFT JOIN
+                colors ON colors.id = classes.color_fk
+            WHERE classes.id = @ClassId
+            GROUP BY
+                classes.id,
+                classes.group_fk,
+                classes.ends_at,
+                classes.starts_at,
+                classes.change_on,
+                classes.irrelevant_since,
+                subjects.id,
+                subjects.name,
+                subjects.abbreviation,
+                weekdays.id,
+                weekdays.name,
+                colors.id,
+                colors.name
+        ";
 }
