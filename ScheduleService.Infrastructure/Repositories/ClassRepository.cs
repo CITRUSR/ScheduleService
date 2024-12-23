@@ -1,7 +1,9 @@
 using Dapper;
 using Newtonsoft.Json;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.CQRS.ClassEntity;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
+using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Domain.Entities;
 using ScheduleService.Infrastructure.Repositories.Sql;
 
@@ -62,7 +64,7 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         return @class;
     }
 
-    public async Task<ClassCreationDto> GetEntitiesForInsertClassAsync(CreateClassDto dto)
+    public async Task<ClassDependenciesDto> GetClassDependencies(GetClassDependenciesDto dto)
     {
         using var connection = _dbContext.CreateConnection();
 
@@ -80,18 +82,18 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
             parameters
         );
 
-        var colorTask = dto.ColorId != null ? await multy.ReadSingleAsync<Color>() : null;
+        var colorTask = dto.ColorId != null ? await multy.ReadFirstOrDefaultAsync<Color>() : null;
 
-        var subjectTask = await multy.ReadSingleAsync<Subject>();
+        var subjectTask = await multy.ReadFirstOrDefaultAsync<Subject>();
 
-        var weekdayTask = await multy.ReadSingleAsync<Weekday>();
+        var weekdayTask = await multy.ReadFirstOrDefaultAsync<Weekday>();
 
         var roomsCountTask = await multy.ReadAsync<Room>();
 
-        return new ClassCreationDto(colorTask, subjectTask, weekdayTask, [.. roomsCountTask]);
+        return new ClassDependenciesDto(colorTask, subjectTask, weekdayTask, [.. roomsCountTask]);
     }
 
-    public Task<Class?> UpdateAsync(Class @class)
+    public async Task<Class?> UpdateAsync(Class @class)
     {
         throw new NotImplementedException();
     }
