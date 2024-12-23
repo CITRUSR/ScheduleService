@@ -13,9 +13,40 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
 {
     private readonly IDbContext _dbContext = dbContext;
 
-    public Task<Class?> DeleteAsync(int id)
+    public async Task<Class?> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var parameters = new DynamicParameters();
+
+        parameters.Add("ClassId", id);
+
+        var classes = await connection.QueryAsync<
+            Class,
+            Subject,
+            Weekday,
+            Color?,
+            string,
+            string,
+            Class
+        >(
+            ClassQueries.DeleteClass,
+            (cl, subject, weekday, color, teacherIds, rooms) =>
+            {
+                cl.Subject = subject;
+                cl.Weekday = weekday;
+                cl.Color = color;
+                cl.TeacherIds = JsonConvert.DeserializeObject<List<Guid>>(teacherIds);
+                cl.Rooms = JsonConvert.DeserializeObject<List<Room>>(rooms);
+                return cl;
+            },
+            parameters,
+            splitOn: "id, id, id, teachersIds, rooms"
+        );
+
+        var @class = classes.FirstOrDefault();
+
+        return @class;
     }
 
     public Task<List<Class>> GetAsync()

@@ -228,6 +228,12 @@ public static class ClassQueries
                 weekdays.id,
                 weekdays.name,
                 colors.id,
-                colors.name
+                colors.name;
+        ";
+    public static readonly string DeleteClass =
+        GetClassById
+        + @"
+            DELETE FROM classes
+            WHERE id = @ClassId;
         ";
 }
