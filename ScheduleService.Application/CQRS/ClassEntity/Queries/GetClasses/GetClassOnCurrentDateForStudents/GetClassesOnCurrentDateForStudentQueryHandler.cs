@@ -27,7 +27,7 @@ public class GetClassesOnCurrentDateForStudentQueryHandler(
     {
         //order corresponds to weekday id
         //move order from 0 as sunday to 1 as monday and 7 as sunday for corresponding weekday id
-        var CurrentWeekdayOrder = ((int)DateTime.Now.DayOfWeek + 6) % 7 + 1;
+        var CurrentWeekdayOrder = DateTime.Now.GetCurrentWeekdayOrder();
 
         var weekday = await _weekdayHandler.Handle(
             new GetWeekdayByIdQuery(CurrentWeekdayOrder),
