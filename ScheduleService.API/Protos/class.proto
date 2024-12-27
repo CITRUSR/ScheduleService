@@ -16,6 +16,8 @@ service ClassService {
   rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse);
   rpc GetClassById(GetClassByIdRequest) returns (GetClassByIdResponse);
   rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse);
+  rpc GetClassesOnCurrentDateForStudent(GetClassesOnCurrentDateRequest)
+      returns (GetClassesOnCurrentDateForStudentResponse);
 }
 
 message Class {
@@ -30,6 +32,22 @@ message Class {
   google.protobuf.StringValue IrrelevantSince = 9;
   repeated string TeacherIds = 10;
   repeated room.Room Rooms = 11;
+}
+
+message ClassDetailDto {
+  int32 Id = 1;
+  subject.Subject Subject = 2;
+  google.protobuf.Duration StartsAt = 3;
+  google.protobuf.Duration EndsAt = 4;
+  google.protobuf.StringValue ChangeOn = 5;
+  repeated string TeacherIds = 7;
+  repeated room.Room Rooms = 8;
+  int32 Order = 9;
+}
+
+message ColorClassesDto {
+  color.Color Color = 1;
+  repeated ClassDetailDto Classes = 2;
 }
 
 message CreateClassRequest {
@@ -68,3 +86,10 @@ message GetClassByIdResponse { Class Class = 1; }
 message DeleteClassRequest { int32 Id = 1; }
 
 message DeleteClassResponse { Class Class = 1; }
+
+message GetClassesOnCurrentDateRequest { int32 GroupId = 1; }
+message GetClassesOnCurrentDateForStudentResponse {
+  int32 GroupId = 1;
+  weekday.Weekday Weekday = 2;
+  repeated ColorClassesDto Classes = 3;
+}

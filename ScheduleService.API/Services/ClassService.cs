@@ -5,6 +5,7 @@ using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.DeleteClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClassById;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents;
 
 namespace ScheduleService.API.Services;
 
@@ -58,5 +59,22 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
         var @class = await _mediator.Send(command);
 
         return new DeleteClassResponse { Class = @class.Adapt<Class>() };
+    }
+
+    public override async Task<GetClassesOnCurrentDateForStudentResponse> GetClassesOnCurrentDateForStudent(
+        GetClassesOnCurrentDateRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = request.Adapt<GetClassesOnCurrentDateForStudentQuery>();
+
+        var result = await _mediator.Send(query);
+
+        return new GetClassesOnCurrentDateForStudentResponse
+        {
+            Classes = { result.Classes.Adapt<List<ColorClassesDto>>() },
+            GroupId = result.GroupId,
+            Weekday = result.Weekday.Adapt<Weekday>()
+        };
     }
 }
