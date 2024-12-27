@@ -22,9 +22,13 @@ public class WeekdayRepository(IDbContext dbContext) : IWeekdayRepository
     {
         using var connection = _dbContext.CreateConnection();
 
+        var parameters = new DynamicParameters();
+
+        parameters.Add("WeekdayId", id);
+
         var weekday = await connection.QueryFirstOrDefaultAsync<Weekday>(
             WeekdayQueries.GetWeekdayById,
-            new { id }
+            parameters
         );
 
         return weekday;
