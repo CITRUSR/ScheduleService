@@ -1,5 +1,6 @@
 using Mapster;
 using MediatR;
+using ScheduleService.Application.Common.Extensions;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdayById;
@@ -38,13 +39,8 @@ public class GetClassesOnCurrentDateForStudentQueryHandler(
         );
 
         var colorClassesDto = classes.GroupBy(x => x.Color).Adapt<List<ColorClassesDto>>();
-        foreach (var colorClass in colorClassesDto)
-        {
-            for (var i = 0; i < colorClass.Classes.Count; i++)
-            {
-                colorClass.Classes[i].Order = i + 1;
-            }
-        }
+
+        colorClassesDto.CountClassOrder();
 
         var result = new GetClassesOnCurrentDateForStudentResponse
         {
