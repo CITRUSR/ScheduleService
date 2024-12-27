@@ -236,4 +236,131 @@ public static class ClassQueries
             DELETE FROM classes
             WHERE id = @ClassId;
         ";
+
+    //join all related tables with a join,
+    //even if they are not needed in the query for a flexible system with a dynamic where
+    public static readonly string GetClasses =
+        @"
+             WITH changes AS(
+                SELECT
+                    classes.id,
+                    classes.starts_at AS StartsAt,
+                    classes.ends_at AS EndsAt,
+                    classes.change_on AS ChangeOn,
+                    classes.irrelevant_since AS IrrelevantSince,
+                    classes.group_fk AS GroupId,
+                    classes.weekday_fk AS WeekdayId,
+                    weekdays.name AS WeekdayName,
+                    subjects.id AS SubjectId,
+                    subjects.name AS SubjectName,
+                    subjects.abbreviation AS SubjectAbbreviation,
+                    colors.id AS ColorId,
+                    colors.name AS ColorName
+                FROM classes
+                JOIN
+                    subjects on subjects.id = classes.subject_fk
+                LEFT JOIN
+                    colors ON colors.id = classes.color_fk
+                JOIN
+                    teachers_classes ON teachers_classes.class_fk = classes.id
+                JOIN
+                    classes_rooms ON classes_rooms.class_fk = classes.id
+                JOIN
+                    rooms ON classes_rooms.room_fk = rooms.id
+                JOIN
+                    weekdays ON weekdays.id = classes.weekday_fk
+                WHERE classes.change_on <= @RightChangeDateLimiter AND
+                classes.change_on >= @LeftChangeDateLimiter AND
+                {0}
+            )
+
+            SELECT
+                classes.id,
+                classes.starts_at AS StartsAt,
+                classes.ends_at AS EndsAt,
+                classes.change_on AS ChangeOn,
+                classes.group_fk AS GroupId,
+                classes.weekday_fk AS id,
+                weekdays.name,
+                subjects.id,
+                subjects.name,
+                subjects.abbreviation,
+                colors.id,
+                colors.name,
+                JSON_AGG(teachers_classes.teacher_fk) AS teacherIds,
+                JSON_AGG(rooms) AS rooms
+            FROM
+                classes
+            JOIN
+                subjects ON classes.subject_fk = subjects.id
+            LEFT JOIN
+               changes on classes.id = changes.id
+            JOIN
+                teachers_classes ON teachers_classes.class_fk = classes.id
+            JOIN
+                classes_rooms ON classes_rooms.class_fk = classes.id
+            JOIN
+                rooms ON classes_rooms.room_fk = rooms.id
+            LEFT JOIN
+                colors on classes.color_fk = colors.id
+            JOIN
+                weekdays ON weekdays.id = classes.weekday_fk
+            WHERE changes.id IS NULL AND
+             {0}
+            GROUP BY
+                classes.id,
+                classes.starts_at,
+                classes.ends_at,
+                classes.change_on,
+                classes.group_fk,
+                classes.weekday_fk,
+                weekdays.name,
+                subjects.id,
+                subjects.name,
+                subjects.abbreviation,
+                colors.id,
+                colors.name
+
+            UNION ALL
+
+            SELECT
+                changes.id,
+                changes.StartsAt,
+                changes.EndsAt,
+                changes.ChangeOn,
+                changes.GroupId,
+                changes.WeekdayId AS id,
+                changes.WeekdayName AS name,
+                changes.SubjectId AS id,
+                changes.SubjectName AS name,
+                changes.SubjectAbbreviation AS abbreviation,
+                changes.ColorId AS id,
+                changes.ColorName AS name,
+                JSON_AGG(teachers_classes.teacher_fk) AS teacherIds,
+                JSON_AGG(rooms) AS rooms
+            FROM
+                changes
+            JOIN
+                teachers_classes ON teachers_classes.class_fk = changes.id
+            JOIN
+                classes_rooms ON classes_rooms.class_fk = changes.id
+            JOIN
+                rooms ON classes_rooms.room_fk = rooms.id
+            JOIN
+                weekdays ON weekdays.id = changes.WeekdayId
+            GROUP BY
+                changes.id,
+                changes.StartsAt,
+                changes.EndsAt,
+                changes.ChangeOn,
+                changes.GroupId,
+                changes.WeekdayId,
+                changes.WeekdayName,
+                changes.SubjectId,
+                changes.SubjectName,
+                changes.SubjectAbbreviation,
+                changes.ColorId,
+                changes.ColorName
+            ORDER BY StartsAt
+        ";
 }

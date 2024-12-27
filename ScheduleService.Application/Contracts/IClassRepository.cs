@@ -1,3 +1,4 @@
+using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.CQRS.ClassEntity;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
@@ -12,5 +13,5 @@ public interface IClassRepository
     Task<Class?> UpdateAsync(UpdateClassDto dto);
     Task<Class?> DeleteAsync(int id);
     Task<Class?> GetByIdAsync(int id);
-    Task<List<Class>> GetAsync();
+    Task<List<Class>> GetAsync(IClassSpecification specification);
 }

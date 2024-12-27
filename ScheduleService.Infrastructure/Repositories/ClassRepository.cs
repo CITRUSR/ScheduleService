@@ -1,5 +1,6 @@
 using Dapper;
 using Newtonsoft.Json;
+using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.CQRS.ClassEntity;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
@@ -49,9 +50,39 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         return @class;
     }
 
-    public Task<List<Class>> GetAsync()
+    public async Task<List<Class>> GetAsync(IClassSpecification specification)
     {
-        throw new NotImplementedException();
+        using var connection = _dbContext.CreateConnection();
+
+        var parameters = new DynamicParameters();
+
+        parameters.Add("LeftChangeDateLimiter", specification.LeftChangeDateLimiter);
+        parameters.Add("RightChangeDateLimiter", specification.RightChangeDateLimiter);
+
+        var classes = await connection.QueryAsync<
+            Class,
+            Weekday,
+            Subject,
+            Color?,
+            string,
+            string,
+            Class
+        >(
+            string.Format(ClassQueries.GetClasses, specification.WhereClause),
+            (@class, weekday, subject, color, teacherIds, rooms) =>
+            {
+                @class.Subject = subject;
+                @class.Color = color;
+                @class.Weekday = weekday;
+                @class.TeacherIds = JsonConvert.DeserializeObject<List<Guid>>(teacherIds);
+                @class.Rooms = JsonConvert.DeserializeObject<List<Room>>(rooms);
+                return @class;
+            },
+            parameters,
+            splitOn: "id, id, id, teacherIds, rooms"
+        );
+
+        return [.. classes];
     }
 
     public async Task<Class?> GetByIdAsync(int id)
