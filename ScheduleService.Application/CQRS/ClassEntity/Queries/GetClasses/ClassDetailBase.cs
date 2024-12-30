@@ -2,7 +2,7 @@ using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses;
 
-public class ClassDetailDto
+public class ClassDetailBase
 {
     public int Id { get; set; }
     public int Order { get; set; }
@@ -10,6 +10,5 @@ public class ClassDetailDto
     public TimeSpan StartsAt { get; set; }
     public TimeSpan EndsAt { get; set; }
     public DateTime? ChangeOn { get; set; }
-    public List<Guid> TeacherIds { get; set; }
     public List<Room> Rooms { get; set; }
 };

@@ -5,6 +5,7 @@ using Moq;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student.GetClassOnCurrentDateForStudents;
 using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdayById;
 using ScheduleService.Domain.Entities;
 

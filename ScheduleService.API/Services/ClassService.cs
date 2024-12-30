@@ -5,7 +5,9 @@ using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.DeleteClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClassById;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student.GetClassOnCurrentDateForStudents;
 
 namespace ScheduleService.API.Services;
 
@@ -72,7 +74,7 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
 
         return new GetClassesOnCurrentDateForStudentResponse
         {
-            Classes = { result.Classes.Adapt<List<ColorClassesDto>>() },
+            Classes = { result.Classes.Adapt<List<StudentColorClasses>>() },
             GroupId = result.GroupId,
             Weekday = result.Weekday.Adapt<Weekday>()
         };

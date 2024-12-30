@@ -3,6 +3,8 @@ using MediatR;
 using ScheduleService.Application.Common.Extensions;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student.GetClassOnCurrentDateForStudents;
 using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdayById;
 using ScheduleService.Domain.Entities;
 
@@ -38,7 +40,14 @@ public class GetClassesOnCurrentDateForStudentQueryHandler(
             new GetClassesOnCurrentDateForStudentSpecification(request.GroupId, CurrentWeekdayOrder)
         );
 
-        var colorClassesDto = classes.GroupBy(x => x.Color).Adapt<List<ColorClassesDto>>();
+        var colorClassesDto = classes
+            .GroupBy(x => x.Color)
+            .Select(x => new ColorClassesDto<StudentClassDetailDto>
+            {
+                Color = x.Key,
+                Classes = [.. x.Select(x => x.Adapt<StudentClassDetailDto>())]
+            })
+            .ToList();
 
         colorClassesDto.CountClassOrder();
 

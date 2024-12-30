@@ -4,7 +4,8 @@ namespace ScheduleService.Application.Common.Extensions;
 
 public static class ColorClassedDtoExtension
 {
-    public static void CountClassOrder(this List<ColorClassesDto> dto)
+    public static void CountClassOrder<T>(this List<ColorClassesDto<T>> dto)
+        where T : ClassDetailBase
     {
         foreach (var colorClass in dto)
         {

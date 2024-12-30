@@ -21,18 +21,6 @@ public static class MapsterConfig
         ConfigureCurrentWeekdayRequests();
         ConfigureCurrentWeekdayEntity();
         ConfigureClassRequests();
-        ConfigureClassDtos();
-    }
-
-    private static void ConfigureClassDtos()
-    {
-        TypeAdapterConfig<
-            IGrouping<Domain.Entities.Color?, Domain.Entities.Class>,
-            Application.CQRS.ClassEntity.Queries.GetClasses.ColorClassesDto
-        >
-            .NewConfig()
-            .Map(dest => dest.Color, src => src.Key)
-            .Map(dest => dest.Classes, src => src);
     }
 
     private static void ConfigureClassRequests()
@@ -54,27 +42,27 @@ public static class MapsterConfig
             .Map(dest => dest.Id, src => src.ClassId);
 
         TypeAdapterConfig<
-            Application.CQRS.ClassEntity.Queries.GetClasses.ClassDetailDto,
-            ClassDetailDto
+            Application.CQRS.ClassEntity.Queries.GetClasses.ClassDetailBase,
+            ClassDetailBase
         >
             .NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Subject, src => src.Subject)
             .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
             .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration())
-            .Map(
-                dest => dest.TeacherIds,
-                src => src.TeacherIds.Select(id => id.ToString()).ToList()
-            )
             .Map(dest => dest.Rooms, src => src.Rooms);
 
         TypeAdapterConfig<
-            Application.CQRS.ClassEntity.Queries.GetClasses.ColorClassesDto,
-            ColorClassesDto
+            Application.CQRS.ClassEntity.Queries.GetClasses.ClassDetailBase,
+            ClassDetailBase
         >
             .NewConfig()
-            .Map(dest => dest.Color, src => src.Color)
-            .Map(dest => dest.Classes, src => src.Classes);
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.ChangeOn, src => src.ChangeOn)
+            .Map(dest => dest.Rooms, src => src.Rooms)
+            .Map(dest => dest.Subject, src => src.Subject)
+            .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
+            .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration());
 
         TypeAdapterConfig<
             Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents.GetClassesOnCurrentDateForStudentResponse,
@@ -84,6 +72,13 @@ public static class MapsterConfig
             .Map(dest => dest.GroupId, src => src.GroupId)
             .Map(dest => dest.Weekday, src => src.Weekday)
             .Map(dest => dest.Classes, src => src.Classes);
+
+        TypeAdapterConfig<
+            Application.CQRS.ClassEntity.Queries.GetClasses.Student.StudentClassDetailDto,
+            StudentClassDetail
+        >
+            .NewConfig()
+            .Map(dest => dest.TeacherIds, src => src.TeacherIds.Select(x => x.ToString()).ToList());
     }
 
     private static void ConfigureCurrentWeekdayRequests()
