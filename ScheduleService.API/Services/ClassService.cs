@@ -5,7 +5,10 @@ using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.DeleteClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClassById;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student.GetClassesForWeekForStudent;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student.GetClassOnCurrentDateForStudents;
 
 namespace ScheduleService.API.Services;
@@ -92,6 +95,22 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
         {
             Classes = { result.Classes.Adapt<List<TeacherColorClasses>>(), },
             Weekday = result.Weekday.Adapt<Weekday>()
+        };
+    }
+
+    public override async Task<GetClassesForWeekForStudentResponse> GetClassesForWeekForStudent(
+        GetClassesForWeekForStudentRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = request.Adapt<GetClassesForWeekForStudentQuery>();
+
+        var result = await _mediator.Send(query);
+
+        return new GetClassesForWeekForStudentResponse
+        {
+            Classes = { result.Classes.Adapt<List<StudentWeekdayColorClassesDto>>() },
+            GroupId = result.GroupId
         };
     }
 }
