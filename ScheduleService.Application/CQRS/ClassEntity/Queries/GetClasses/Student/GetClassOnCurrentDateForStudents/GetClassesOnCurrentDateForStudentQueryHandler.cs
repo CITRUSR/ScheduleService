@@ -1,4 +1,3 @@
-using Mapster;
 using MediatR;
 using ScheduleService.Application.Common.Extensions;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
@@ -40,14 +39,7 @@ public class GetClassesOnCurrentDateForStudentQueryHandler(
             new GetClassesOnCurrentDateForStudentSpecification(request.GroupId, CurrentWeekdayOrder)
         );
 
-        var colorClassesDto = classes
-            .GroupBy(x => x.Color)
-            .Select(x => new ColorClassesDto<StudentClassDetailDto>
-            {
-                Color = x.Key,
-                Classes = [.. x.Select(x => x.Adapt<StudentClassDetailDto>())]
-            })
-            .ToList();
+        var colorClassesDto = classes.ToColorClasses<StudentClassDetailDto>();
 
         colorClassesDto.CountClassOrder();
 

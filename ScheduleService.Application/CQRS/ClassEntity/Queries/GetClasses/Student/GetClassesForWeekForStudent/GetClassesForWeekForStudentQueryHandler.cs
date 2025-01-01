@@ -51,13 +51,7 @@ public class GetClassesForWeekForStudentQueryHandler(
             >()
             {
                 Weekday = weekdays[x.Key - 1],
-                Classes = x.GroupBy(c => c.Color)
-                    .Select(c => new ColorClassesDto<StudentClassDetailDto>()
-                    {
-                        Color = c.Key,
-                        Classes = [.. c.Select(g => g.Adapt<StudentClassDetailDto>())]
-                    })
-                    .ToList()
+                Classes = x.ToList().ToColorClasses<StudentClassDetailDto>()
             })
             .ToList();
 

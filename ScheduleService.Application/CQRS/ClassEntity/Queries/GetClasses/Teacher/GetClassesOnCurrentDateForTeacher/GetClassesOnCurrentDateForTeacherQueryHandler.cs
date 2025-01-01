@@ -37,14 +37,7 @@ public class GetClassesOnCurrentDateForTeacherQueryHandler(
             new GetClassesOnCurrentDateForTeacherSpecification(request.TeacherId, weekdayId)
         );
 
-        var colorClasses = classes
-            .GroupBy(x => x.Color)
-            .Select(x => new ColorClassesDto<TeacherClassDetailDto>()
-            {
-                Color = x.Key,
-                Classes = [.. x.Select(x => x.Adapt<TeacherClassDetailDto>())]
-            })
-            .ToList();
+        var colorClasses = classes.ToColorClasses<TeacherClassDetailDto>();
 
         colorClasses.CountClassOrder();
 
