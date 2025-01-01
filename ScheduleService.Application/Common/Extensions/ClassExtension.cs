@@ -22,4 +22,25 @@ public static class ClassExtension
 
         return colorClasses;
     }
+
+    public static List<
+        WeekdayColorClassesDto<TColorClassesDto, KClassDetail>
+    > ToWeekdayColorClasses<TColorClassesDto, KClassDetail>(
+        this List<Class> classes,
+        List<Weekday> weekdays
+    )
+        where TColorClassesDto : ColorClassesDto<KClassDetail>
+        where KClassDetail : ClassDetailBase
+    {
+        var weekdayClasses = classes
+            .GroupBy(x => x.Weekday.Id)
+            .Select(x => new WeekdayColorClassesDto<TColorClassesDto, KClassDetail>()
+            {
+                Weekday = weekdays[x.Key - 1],
+                Classes = [.. x.ToList().ToColorClasses<KClassDetail>().Cast<TColorClassesDto>()]
+            })
+            .ToList();
+
+        return weekdayClasses;
+    }
 }

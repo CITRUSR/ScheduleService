@@ -43,17 +43,10 @@ public class GetClassesForWeekForStudentQueryHandler(
             new GetClassesForWeekForStudentSpecification(leftBorder, rightBorder, request.GroupId)
         );
 
-        var weekdayClasses = classes
-            .GroupBy(x => x.Weekday.Id)
-            .Select(x => new WeekdayColorClassesDto<
-                ColorClassesDto<StudentClassDetailDto>,
-                StudentClassDetailDto
-            >()
-            {
-                Weekday = weekdays[x.Key - 1],
-                Classes = x.ToList().ToColorClasses<StudentClassDetailDto>()
-            })
-            .ToList();
+        var weekdayClasses = classes.ToWeekdayColorClasses<
+            ColorClassesDto<StudentClassDetailDto>,
+            StudentClassDetailDto
+        >(weekdays);
 
         for (int i = 0; i < weekdayClasses.Count; i++)
         {
