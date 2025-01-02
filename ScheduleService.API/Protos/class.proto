@@ -23,6 +23,8 @@ service ClassService {
       returns (GetClassesOnCurrentDateForTeacherResponse);
   rpc GetClassesForWeekForStudent(GetClassesForWeekForStudentRequest)
       returns (GetClassesForWeekForStudentResponse);
+  rpc GetClassesForWeekForTeacher(GetClassesForWeekForTeacherRequest)
+      returns (GetClassesForWeekForTeacherResponse);
 }
 
 message Class {
@@ -91,6 +93,11 @@ message StudentWeekdayColorClassesDto {
   repeated StudentColorClasses Classes = 2;
 }
 
+message TeacherWeekdayColorClassesDto {
+  weekday.Weekday Weekday = 1;
+  repeated TeacherColorClasses Classes = 2;
+}
+
 message CreateClassRequest {
   int32 GroupId = 2;
   int32 SubjectId = 3;
@@ -144,4 +151,10 @@ message GetClassesForWeekForStudentRequest { int32 GroupId = 1; }
 message GetClassesForWeekForStudentResponse {
   int32 GroupId = 1;
   repeated StudentWeekdayColorClassesDto Classes = 2;
+}
+
+message GetClassesForWeekForTeacherRequest { string TeacherId = 1; }
+message GetClassesForWeekForTeacherResponse {
+  string TeacherId = 1;
+  repeated TeacherWeekdayColorClassesDto Classes = 2;
 }
