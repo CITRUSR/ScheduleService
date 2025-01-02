@@ -11,4 +11,9 @@ public interface IClassService
         Weekday weekday
     )> GetClassesForDay<TClassDetail>(IClassSpecification specification, int weekdayOrder)
         where TClassDetail : ClassDetailBase;
+
+    public Task<
+        List<WeekdayColorClassesDto<ColorClassesDto<TClassDetail>, TClassDetail>>
+    > GetClassesForWeek<TClassDetail>(IClassSpecification specification)
+        where TClassDetail : ClassDetailBase;
 }

@@ -5,6 +5,7 @@ using ScheduleService.Application.Contracts;
 using ScheduleService.Application.Contracts.Services;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses;
 using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdayById;
+using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdays;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.Common.Services;
@@ -30,5 +31,27 @@ public class ClassService(IUnitOfWork unitOfWork, IMediator mediator) : IClassSe
         colorClassesDto.CountClassOrder();
 
         return (colorClassesDto, weekday);
+    }
+
+    public async Task<
+        List<WeekdayColorClassesDto<ColorClassesDto<TClassDetail>, TClassDetail>>
+    > GetClassesForWeek<TClassDetail>(IClassSpecification specification)
+        where TClassDetail : ClassDetailBase
+    {
+        var weekdays = await _mediator.Send(new GetWeekdaysQuery());
+
+        var classes = await _unitOfWork.ClassRepository.GetAsync(specification);
+
+        var weekdayClasses = classes.ToWeekdayColorClasses<
+            ColorClassesDto<TClassDetail>,
+            TClassDetail
+        >(weekdays);
+
+        for (int i = 0; i < weekdayClasses.Count; i++)
+        {
+            weekdayClasses[i].Classes.CountClassOrder();
+        }
+
+        return weekdayClasses;
     }
 }
