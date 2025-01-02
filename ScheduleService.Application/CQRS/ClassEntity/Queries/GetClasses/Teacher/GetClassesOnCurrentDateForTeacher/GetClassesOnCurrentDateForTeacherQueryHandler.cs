@@ -1,49 +1,34 @@
-using Mapster;
 using MediatR;
 using ScheduleService.Application.Common.Extensions;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
-using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Services;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Teacher;
-using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdayById;
-using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
 
-public class GetClassesOnCurrentDateForTeacherQueryHandler(
-    IRequestHandler<GetWeekdayByIdQuery, Weekday> weekdayHandler,
-    IUnitOfWork unitOfWork
-)
+public class GetClassesOnCurrentDateForTeacherQueryHandler(IClassService classService)
     : IRequestHandler<
         GetClassesOnCurrentDateForTeacherQuery,
         GetClassesOnCurrentDateForTeacherResponse
     >
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IRequestHandler<GetWeekdayByIdQuery, Weekday> _weekdayHandler = weekdayHandler;
+    private readonly IClassService _classService = classService;
 
     public async Task<GetClassesOnCurrentDateForTeacherResponse> Handle(
         GetClassesOnCurrentDateForTeacherQuery request,
         CancellationToken cancellationToken
     )
     {
-        int weekdayId = DateTime.Now.GetCurrentWeekdayOrder() + 1;
+        int weekdayId = DateTime.Now.GetCurrentWeekdayOrder();
 
-        var weekday = await _weekdayHandler.Handle(
-            new GetWeekdayByIdQuery(weekdayId),
-            cancellationToken
+        var (classes, weekday) = await _classService.GetClassesForDay<TeacherClassDetailDto>(
+            new GetClassesOnCurrentDateForTeacherSpecification(request.TeacherId, weekdayId),
+            weekdayId
         );
-
-        var classes = await _unitOfWork.ClassRepository.GetAsync(
-            new GetClassesOnCurrentDateForTeacherSpecification(request.TeacherId, weekdayId)
-        );
-
-        var colorClasses = classes.ToColorClasses<TeacherClassDetailDto>();
-
-        colorClasses.CountClassOrder();
 
         return new GetClassesOnCurrentDateForTeacherResponse
         {
-            Classes = colorClasses,
+            Classes = classes,
             Weekday = weekday
         };
     }

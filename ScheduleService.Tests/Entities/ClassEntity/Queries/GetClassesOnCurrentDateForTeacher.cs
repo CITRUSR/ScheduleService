@@ -1,69 +1,63 @@
 using AutoFixture;
 using FluentAssertions;
-using MediatR;
 using Moq;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
-using ScheduleService.Application.Contracts;
-using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
-using ScheduleService.Application.CQRS.WeekdayEntity.Queries.GetWeekdayById;
+using ScheduleService.Application.Contracts.Services;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Student.GetClassOnCurrentDateForStudents;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Teacher;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Tests.Entities.ClassEntity.Queries;
 
 public class GetClassesOnCurrentDateForTeacher
 {
-    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-    private readonly Mock<IRequestHandler<GetWeekdayByIdQuery, Weekday>> _weekdayHandler;
+    private readonly Mock<IClassService> _mockClassService;
     private readonly Fixture _fixture;
-    private readonly GetClassesOnCurrentDateForTeacherQuery _query;
-    private readonly GetClassesOnCurrentDateForTeacherQueryHandler _handler;
+    private readonly GetClassesOnCurrentDateForStudentQuery _query;
+    private readonly GetClassesOnCurrentDateForStudentQueryHandler _handler;
 
     public GetClassesOnCurrentDateForTeacher()
     {
-        _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _weekdayHandler = new Mock<IRequestHandler<GetWeekdayByIdQuery, Weekday>>();
+        _mockClassService = new Mock<IClassService>();
         _fixture = new Fixture();
-        _query = _fixture.Create<GetClassesOnCurrentDateForTeacherQuery>();
-        _handler = new GetClassesOnCurrentDateForTeacherQueryHandler(
-            _weekdayHandler.Object,
-            _mockUnitOfWork.Object
-        );
+        _query = _fixture.Create<GetClassesOnCurrentDateForStudentQuery>();
+        _handler = new GetClassesOnCurrentDateForStudentQueryHandler(_mockClassService.Object);
     }
 
     [Fact]
     public async Task GetClassesOnCurrentDateForTeacher_ShouldBe_Success()
     {
-        var classes = _fixture.CreateMany<Class>(5).ToList();
+        var classes = _fixture.CreateMany<ColorClassesDto<TeacherClassDetailDto>>(5).ToList();
 
-        _mockUnitOfWork
+        var currentWeekdayOrder = 2;
+
+        var weekday = _fixture.Build<Weekday>().With(x => x.Id, currentWeekdayOrder).Create();
+
+        _mockClassService
             .Setup(x =>
-                x.ClassRepository.GetAsync(
-                    It.IsAny<GetClassesOnCurrentDateForTeacherSpecification>()
+                x.GetClassesForDay<TeacherClassDetailDto>(
+                    It.IsAny<IClassSpecification>(),
+                    currentWeekdayOrder
                 )
             )
-            .ReturnsAsync(classes);
+            .ReturnsAsync((classes, weekday));
 
-        _weekdayHandler
-            .Setup(x => x.Handle(It.IsAny<GetWeekdayByIdQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Weekday());
+        var result = await _handler.Handle(_query, default);
 
-        var result = await _handler.Handle(_query, CancellationToken.None);
-
-        result.Classes.Select(x => x.Classes.Select((d, index) => d.Order.Should().Be(index + 1)));
-
-        _weekdayHandler.Verify(
-            x => x.Handle(It.IsAny<GetWeekdayByIdQuery>(), It.IsAny<CancellationToken>()),
-            Times.Once()
-        );
-
-        _mockUnitOfWork.Verify(
+        _mockClassService.Verify(
             x =>
-                x.ClassRepository.GetAsync(
-                    It.IsAny<GetClassesOnCurrentDateForTeacherSpecification>()
+                x.GetClassesForDay<TeacherClassDetailDto>(
+                    It.IsAny<IClassSpecification>(),
+                    currentWeekdayOrder
                 ),
             Times.Once()
         );
 
         result.Should().NotBeNull();
+        result.Classes.Should().BeEquivalentTo(classes);
+        result.GroupId.Should().Be(_query.GroupId);
+        result.Weekday.Should().BeEquivalentTo(weekday);
     }
 }
