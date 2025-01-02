@@ -12,6 +12,7 @@
     <Protobuf Include="Protos/subject.proto" GrpcServices="Server, Client" />
     <Protobuf Include="Protos/weekday.proto" GrpcServices="Server, Client" />
     <Protobuf Include="Protos/currentWeekday.proto" GrpcServices="Server, Client" />
+    <Protobuf Include="Protos/class.proto" GrpcServices="Server, Client"/>
     <Protobuf Include="Protos/shared.proto" GrpcServices="Server, Client" />
   </ItemGroup>
 

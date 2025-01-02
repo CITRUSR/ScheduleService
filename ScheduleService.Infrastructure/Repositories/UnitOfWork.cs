@@ -11,6 +11,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public IWeekdayRepository WeekdayRepository { get; }
     public ICurrentWeekdayRepository CurrentWeekdayRepository { get; }
 
+    public IClassRepository ClassRepository { get; }
+
     private readonly IDbContext _dbContext;
 
     private readonly IDbConnection _connection;
@@ -22,7 +24,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         IRoomRepository roomRepository,
         ISubjectRepository subjectRepository,
         IWeekdayRepository weekdayRepository,
-        ICurrentWeekdayRepository currentWeekdayRepository
+        ICurrentWeekdayRepository currentWeekdayRepository,
+        IClassRepository classRepository
     )
     {
         _dbContext = dbContext;
@@ -34,6 +37,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         SubjectRepository = subjectRepository;
         WeekdayRepository = weekdayRepository;
         CurrentWeekdayRepository = currentWeekdayRepository;
+        ClassRepository = classRepository;
     }
 
     public void CommitTransaction()
