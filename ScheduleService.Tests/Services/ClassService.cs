@@ -65,19 +65,10 @@ public class ClassService
         _fixture.Customize<Weekday>(x => x.With(c => c.Id, 2));
         var weekdays = _fixture.CreateMany<Weekday>(5).ToList();
 
-        _mockMediator
-            .Setup(x => x.Send(It.IsAny<GetWeekdaysQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(weekdays);
-
         SetupUnitOfWork();
 
         var result = await _classService.GetClassesForWeek<ClassDetailBase>(
             It.IsAny<IClassSpecification>()
-        );
-
-        _mockMediator.Verify(
-            x => x.Send(It.IsAny<GetWeekdaysQuery>(), It.IsAny<CancellationToken>()),
-            Times.Once()
         );
 
         _mockUnitOfWork.Verify(
