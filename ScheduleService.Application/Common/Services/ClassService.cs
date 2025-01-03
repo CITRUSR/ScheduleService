@@ -38,14 +38,12 @@ public class ClassService(IUnitOfWork unitOfWork, IMediator mediator) : IClassSe
     > GetClassesForWeek<TClassDetail>(IClassSpecification specification)
         where TClassDetail : ClassDetailBase
     {
-        var weekdays = await _mediator.Send(new GetWeekdaysQuery());
-
         var classes = await _unitOfWork.ClassRepository.GetAsync(specification);
 
         var weekdayClasses = classes.ToWeekdayColorClasses<
             ColorClassesDto<TClassDetail>,
             TClassDetail
-        >(weekdays);
+        >();
 
         for (int i = 0; i < weekdayClasses.Count; i++)
         {

@@ -12,10 +12,10 @@ public static class ClassExtension
         where TClassDetail : ClassDetailBase
     {
         var colorClasses = classes
-            .GroupBy(x => x.Color)
+            .GroupBy(x => new { x.Color.Name, x.Color.Id })
             .Select(x => new ColorClassesDto<TClassDetail>
             {
-                Color = x.Key,
+                Color = new Color() { Id = x.Key.Id, Name = x.Key.Name },
                 Classes = [.. x.Select(x => x.Adapt<TClassDetail>())]
             })
             .ToList();
@@ -25,18 +25,15 @@ public static class ClassExtension
 
     public static List<
         WeekdayColorClassesDto<TColorClassesDto, KClassDetail>
-    > ToWeekdayColorClasses<TColorClassesDto, KClassDetail>(
-        this List<Class> classes,
-        List<Weekday> weekdays
-    )
+    > ToWeekdayColorClasses<TColorClassesDto, KClassDetail>(this List<Class> classes)
         where TColorClassesDto : ColorClassesDto<KClassDetail>
         where KClassDetail : ClassDetailBase
     {
         var weekdayClasses = classes
-            .GroupBy(x => x.Weekday.Id)
+            .GroupBy(x => new { x.Weekday.Id, x.Weekday.Name })
             .Select(x => new WeekdayColorClassesDto<TColorClassesDto, KClassDetail>()
             {
-                Weekday = weekdays[x.Key - 1],
+                Weekday = new Weekday() { Id = x.Key.Id, Name = x.Key.Name },
                 Classes = [.. x.ToList().ToColorClasses<KClassDetail>().Cast<TColorClassesDto>()]
             })
             .ToList();
