@@ -26,15 +26,17 @@ public class GetClassById
     [Fact]
     public async Task GetClassById_ShouldBe_Success()
     {
+        var @class = _fixture.Create<Class>();
+
         _mockUnitOfWork
             .Setup(x => x.ClassRepository.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new Class());
+            .ReturnsAsync(@class);
 
         var res = await _handler.Handle(_query, default);
 
         _mockUnitOfWork.Verify(x => x.ClassRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
 
-        res.Should().NotBeNull();
+        res.Id.Should().Be(@class.Id);
     }
 
     [Fact]

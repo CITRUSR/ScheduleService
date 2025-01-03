@@ -42,6 +42,8 @@ public class CreateClass
     {
         var ClassDependenciesDto = _fixture.Create<ClassDependenciesDto>();
 
+        var @class = _fixture.Create<Class>();
+
         SetupGetClassDependencies(ClassDependenciesDto);
 
         _mockTeacherService
@@ -52,7 +54,7 @@ public class CreateClass
 
         _mockUnitOfWork
             .Setup(x => x.ClassRepository.InsertAsync(It.IsAny<CreateClassDto>()))
-            .ReturnsAsync(new Class());
+            .ReturnsAsync(@class);
 
         var result = await _handler.Handle(_command, default);
 
@@ -75,7 +77,7 @@ public class CreateClass
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(@class.Id);
     }
 
     [Fact]

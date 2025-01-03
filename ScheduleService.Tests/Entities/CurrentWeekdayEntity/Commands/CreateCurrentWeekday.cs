@@ -31,13 +31,15 @@ public class CreateCurrentWeekday
     }
 
     [Fact]
-    public void CreateCurrentWeekday_ShouldBe_Success()
+    public async Task CreateCurrentWeekday_ShouldBe_Success()
     {
+        var currentWeekday = _fixture.Create<CurrentWeekday>();
+
         _mockUnitOfWork
             .Setup(x => x.CurrentWeekdayRepository.InsertAsync(It.IsAny<CurrentWeekday>()))
-            .ReturnsAsync(new CurrentWeekday());
+            .ReturnsAsync(currentWeekday);
 
-        var result = _handler.Handle(_command, default);
+        var result = await _handler.Handle(_command, default);
 
         _mockUnitOfWork.Verify(
             x => x.CurrentWeekdayRepository.InsertAsync(It.IsAny<CurrentWeekday>()),
@@ -50,7 +52,7 @@ public class CreateCurrentWeekday
             Times.Once()
         );
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(currentWeekday.Id);
     }
 
     [Fact]

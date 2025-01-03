@@ -26,15 +26,17 @@ public class GetCurrentWeekday
     [Fact]
     public async Task GetCurrentWeekday_ShouldBe_Success()
     {
+        var currentWeekday = _fixture.Create<CurrentWeekday>();
+
         _mockUnitOfWork
             .Setup(x => x.CurrentWeekdayRepository.GetAsync())
-            .ReturnsAsync(new CurrentWeekday());
+            .ReturnsAsync(currentWeekday);
 
         var result = await _handler.Handle(_query, CancellationToken.None);
 
         _mockUnitOfWork.Verify(x => x.CurrentWeekdayRepository.GetAsync(), Times.Once());
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(currentWeekday.Id);
     }
 
     [Fact]

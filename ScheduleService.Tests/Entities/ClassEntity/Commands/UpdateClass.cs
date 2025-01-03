@@ -43,6 +43,8 @@ public class UpdateClass
     {
         var dependencies = _fixture.Create<ClassDependenciesDto>();
 
+        var @class = _fixture.Create<Class>();
+
         SetupGetClassDependencies(dependencies);
 
         _mockTeacherService
@@ -53,7 +55,7 @@ public class UpdateClass
 
         _mockUnitOfWork
             .Setup(x => x.ClassRepository.UpdateAsync(It.IsAny<UpdateClassDto>()))
-            .ReturnsAsync(new Class());
+            .ReturnsAsync(@class);
 
         var result = await _handler.Handle(_command, default);
 
@@ -76,7 +78,7 @@ public class UpdateClass
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(@class.Id);
     }
 
     [Fact]

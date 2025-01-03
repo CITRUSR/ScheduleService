@@ -27,9 +27,11 @@ public class CreateSubject
     [Fact]
     public async Task CreateSubject_ShouldBe_Success()
     {
+        var subject = _fixture.Create<Subject>();
+
         _mockUnitOfWork
             .Setup(x => x.SubjectRepository.InsertAsync(It.IsAny<Subject>()))
-            .ReturnsAsync(new Subject());
+            .ReturnsAsync(subject);
 
         var createdSubject = await _handler.Handle(_command, default);
 
@@ -40,7 +42,7 @@ public class CreateSubject
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
 
-        createdSubject.Should().NotBeNull();
+        createdSubject.Id.Should().Be(subject.Id);
     }
 
     [Fact]

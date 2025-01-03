@@ -145,6 +145,7 @@ message GetClassesOnCurrentDateForTeacherRequest { string TeacherId = 1; }
 message GetClassesOnCurrentDateForTeacherResponse {
   repeated TeacherColorClasses Classes = 1;
   weekday.Weekday Weekday = 2;
+  string TeacherId = 3;
 }
 
 message GetClassesForWeekForStudentRequest { int32 GroupId = 1; }

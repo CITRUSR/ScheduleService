@@ -32,9 +32,11 @@ public class UpdateCurrentWeekday
     [Fact]
     public async Task UpdateCurrentWeekday_ShouldBe_Success()
     {
+        var currentWeekday = _fixture.Create<CurrentWeekday>();
+
         _mockUnitOfWork
             .Setup(x => x.CurrentWeekdayRepository.UpdateAsync(It.IsAny<CurrentWeekday>()))
-            .ReturnsAsync(new CurrentWeekday());
+            .ReturnsAsync(currentWeekday);
 
         var result = await _handler.Handle(_command, default);
 
@@ -49,7 +51,7 @@ public class UpdateCurrentWeekday
             Times.Once()
         );
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(currentWeekday.Id);
     }
 
     [Fact]

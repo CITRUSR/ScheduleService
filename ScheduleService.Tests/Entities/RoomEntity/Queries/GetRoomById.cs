@@ -26,15 +26,17 @@ public class GetRoomById
     [Fact]
     public async Task GetRoomById_ShouldBe_Success()
     {
+        var room = _fixture.Create<Room>();
+
         _mockUnitOfWork
             .Setup(x => x.RoomRepository.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new Room());
+            .ReturnsAsync(room);
 
-        var room = await _handler.Handle(_query, default);
+        var result = await _handler.Handle(_query, default);
 
         _mockUnitOfWork.Verify(x => x.RoomRepository.GetByIdAsync(It.IsAny<int>()), Times.Once());
 
-        room.Should().NotBeNull();
+        result.Id.Should().Be(room.Id);
     }
 
     [Fact]

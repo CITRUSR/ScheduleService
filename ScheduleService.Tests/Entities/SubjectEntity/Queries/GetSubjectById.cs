@@ -26,9 +26,11 @@ public class GetSubjectById
     [Fact]
     public async Task GetSubjectById_ShouldBe_Success()
     {
+        var subject = _fixture.Create<Subject>();
+
         _mockUnitOfWork
             .Setup(x => x.SubjectRepository.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new Subject());
+            .ReturnsAsync(subject);
 
         var result = await _handler.Handle(_query, default);
 
@@ -37,7 +39,7 @@ public class GetSubjectById
             Times.Once()
         );
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(subject.Id);
     }
 
     [Fact]

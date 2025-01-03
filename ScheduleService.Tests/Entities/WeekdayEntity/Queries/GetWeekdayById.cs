@@ -26,9 +26,11 @@ public class GetWeekdayById
     [Fact]
     public async Task GetWeekdayById_ShouldBe_Success()
     {
+        var weekday = _fixture.Create<Weekday>();
+
         _mockUnitOfWork
             .Setup(x => x.WeekdayRepository.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new Weekday());
+            .ReturnsAsync(weekday);
 
         var result = await _handler.Handle(_query, default);
 
@@ -37,7 +39,7 @@ public class GetWeekdayById
             Times.Once()
         );
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(weekday.Id);
     }
 
     [Fact]

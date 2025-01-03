@@ -29,7 +29,8 @@ public class GetClassesOnCurrentDateForTeacherQueryHandler(IClassService classSe
         return new GetClassesOnCurrentDateForTeacherResponse
         {
             Classes = classes,
-            Weekday = weekday
+            Weekday = weekday,
+            TeacherId = request.TeacherId
         };
     }
 }

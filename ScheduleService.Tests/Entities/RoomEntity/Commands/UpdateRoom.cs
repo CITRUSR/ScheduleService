@@ -27,17 +27,19 @@ public class UpdateRoom
     [Fact]
     public async Task UpdateRoom_ShouldBe_Success()
     {
+        var room = _fixture.Create<Room>();
+
         _mockUnitOfWork
             .Setup(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()))
-            .ReturnsAsync(new Room());
+            .ReturnsAsync(room);
 
-        var room = await _handler.Handle(_command, default);
+        var result = await _handler.Handle(_command, default);
 
         _mockUnitOfWork.Verify(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()), Times.Once());
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
 
-        room.Should().NotBeNull();
+        result.Id.Should().Be(room.Id);
     }
 
     [Fact]

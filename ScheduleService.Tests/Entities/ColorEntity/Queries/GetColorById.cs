@@ -26,15 +26,17 @@ public class GetColorById
     [Fact]
     public async Task GetColorById_ShouldBe_Success()
     {
+        var color = _fixture.Create<Color>();
+
         _mockUnitOfWork
             .Setup(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new Color());
+            .ReturnsAsync(color);
 
         var result = await _handler.Handle(_query, default);
 
         _mockUnitOfWork.Verify(x => x.ColorRepository.GetByIdAsync(It.IsAny<int>()), Times.Once());
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(color.Id);
     }
 
     [Fact]

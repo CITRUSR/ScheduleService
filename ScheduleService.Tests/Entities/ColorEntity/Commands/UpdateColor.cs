@@ -27,9 +27,11 @@ public class UpdateColor
     [Fact]
     public async Task UpdateColor_ShouldBe_Success()
     {
+        var color = _fixture.Create<Color>();
+
         _mockUnitOfWork
             .Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()))
-            .ReturnsAsync(new Color());
+            .ReturnsAsync(color);
 
         var result = await _handler.Handle(_command, default);
 
@@ -37,7 +39,7 @@ public class UpdateColor
 
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
 
-        result.Should().NotBeNull();
+        result.Id.Should().Be(color.Id);
     }
 
     [Fact]
