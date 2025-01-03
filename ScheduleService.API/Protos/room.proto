@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package room;
+
+import "Protos/shared.proto";
+import "google/protobuf/wrappers.proto";
+
+service RoomService {
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+  rpc GetRoomById(GetRoomByIdRequest) returns (GetRoomByIdResponse);
+  rpc UpdateRoom(UpdateRoomRequest) returns (UpdateRoomResponse);
+  rpc DeleteRoom(DeleteRoomRequest) returns (DeleteRoomResponse);
+  rpc GetRooms(GetRoomsRequest) returns (GetRoomsResponse);
+}
+
+message Room {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue FullName = 3;
+}
+
+message CreateRoomRequest {
+  string Name = 1;
+  google.protobuf.StringValue FullName = 2;
+}
+
+message CreateRoomResponse { Room Room = 1; }
+
+message GetRoomByIdRequest { int32 Id = 1; }
+message GetRoomByIdResponse { Room Room = 1; }
+
+message UpdateRoomRequest {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue FullName = 3;
+}
+
+message UpdateRoomResponse { Room Room = 1; }
+
+message DeleteRoomRequest { int32 Id = 1; }
+message DeleteRoomResponse { Room Room = 1; }
+
+enum RoomFilterState {
+  Name = 0;
+  FullName = 1;
+}
+
+message RoomFilter {
+  google.protobuf.StringValue SearchString = 1;
+  RoomFilterState FilterBy = 2;
+  OrderState OrderState = 3;
+}
+
+message GetRoomsRequest {
+  RoomFilter Filter = 1;
+  PaginationParameters PaginationParameters = 2;
+}
+message GetRoomsResponse {
+  repeated Room Rooms = 1;
+  int32 LastPage = 2;
+}

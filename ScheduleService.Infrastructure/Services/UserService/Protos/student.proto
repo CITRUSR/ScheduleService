@@ -1,0 +1,124 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "UserServiceClient";
+
+package Student;
+
+import "google/protobuf/wrappers.proto";
+import "Services/UserService/Protos/shared.proto";
+
+service StudentService {
+  rpc CreateStudent(CreateStudentRequest) returns (StudentShortInfo);
+  rpc DropOutStudents(DropOutStudentsRequest) returns (DropOutStudentsResponse);
+  rpc DeleteStudents(DeleteStudentsRequest) returns (DeleteStudentsResponse);
+  rpc SoftDeleteStudents(SoftDeleteStudentsRequest)
+      returns (SoftDeleteStudentsResponse);
+  rpc RecoveryStudents(RecoveryStudentsRequest)
+      returns (RecoveryStudentsResponse);
+  rpc EditStudent(EditStudentRequest) returns (StudentShortInfo);
+  rpc GetStudentById(GetStudentByIdRequest) returns (StudentModel);
+  rpc GetStudentBySsoId(GetStudentBySsoIdRequest) returns (StudentModel);
+  rpc GetStudentsByGroupId(GetStudentsByGroupIdRequest)
+      returns (GetStudentsByGroupIdResponse);
+  rpc GetStudents(GetStudentsRequest) returns (GetStudentsResponse);
+}
+
+message StudentModel {
+  string Id = 1;
+  string SsoId = 2;
+  string FirstName = 3;
+  string LastName = 4;
+  google.protobuf.StringValue PatronymicName = 5;
+  int32 GroupId = 6;
+  google.protobuf.StringValue DroppedOutAt = 7;
+  bool IsDeleted = 9;
+}
+
+message StudentViewModel {
+  string Id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  google.protobuf.StringValue PatronymicName = 4;
+  string GroupName = 5;
+}
+
+message StudentShortInfo {
+  string Id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+}
+
+message CreateStudentRequest {
+  string SsoId = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  google.protobuf.StringValue PatronymicName = 4;
+  int32 GroupId = 5;
+}
+
+message CreateStudentResponse { string Id = 1; }
+
+message DropOutStudentsRequest {
+  repeated string Ids = 1;
+  string DroppedTime = 3;
+}
+
+message DropOutStudentsResponse { repeated StudentShortInfo Students = 1; }
+
+message DeleteStudentsRequest { repeated string Ids = 1; }
+
+message DeleteStudentsResponse { repeated StudentShortInfo Students = 1; }
+
+message SoftDeleteStudentsRequest { repeated string Ids = 1; }
+
+message SoftDeleteStudentsResponse { repeated StudentShortInfo Students = 1; }
+
+message RecoveryStudentsRequest { repeated string Ids = 1; }
+
+message RecoveryStudentsResponse { repeated StudentShortInfo Students = 1; }
+
+message EditStudentRequest {
+  string Id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  google.protobuf.StringValue PatronymicName = 4;
+  int32 GroupId = 5;
+  bool IsDeleted = 6;
+}
+
+message GetStudentByIdRequest { string Id = 1; }
+
+enum SortState {
+  FistNameAsc = 0;
+  FirstNameDesc = 1;
+  LastNameAsc = 2;
+  LastNameDesc = 3;
+  GroupAsc = 4;
+  GroupDesc = 5;
+}
+
+enum DroppedOutStatus {
+  All = 0;
+  OnlyDroppedOut = 1;
+  OnlyActive = 2;
+}
+
+message GetStudentsRequest {
+  google.protobuf.StringValue SearchString = 1;
+  int32 Page = 2;
+  int32 PageSize = 3;
+  SortState SortState = 4;
+  DroppedOutStatus DroppedOutStatus = 5;
+  DeletedStatus DeletedStatus = 6;
+}
+
+message GetStudentsResponse {
+  repeated StudentViewModel Students = 1;
+  int32 LastPage = 2;
+}
+
+message GetStudentBySsoIdRequest { string SsoId = 1; }
+
+message GetStudentsByGroupIdRequest { int32 GroupId = 1; }
+
+message GetStudentsByGroupIdResponse { repeated StudentViewModel Students = 1; }

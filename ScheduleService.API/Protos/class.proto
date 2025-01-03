@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package class;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/duration.proto";
+import "Protos/room.proto";
+import "Protos/subject.proto";
+import "Protos/weekday.proto";
+import "Protos/color.proto";
+
+service ClassService {
+  rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
+  rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse);
+  rpc GetClassById(GetClassByIdRequest) returns (GetClassByIdResponse);
+  rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse);
+  rpc GetClassesOnCurrentDateForStudent(GetClassesOnCurrentDateRequest)
+      returns (GetClassesOnCurrentDateForStudentResponse);
+  rpc GetClassesOnCurrentDateForTeacher(
+      GetClassesOnCurrentDateForTeacherRequest)
+      returns (GetClassesOnCurrentDateForTeacherResponse);
+  rpc GetClassesForWeekForStudent(GetClassesForWeekForStudentRequest)
+      returns (GetClassesForWeekForStudentResponse);
+  rpc GetClassesForWeekForTeacher(GetClassesForWeekForTeacherRequest)
+      returns (GetClassesForWeekForTeacherResponse);
+}
+
+message Class {
+  int32 Id = 1;
+  int32 GroupId = 2;
+  subject.Subject Subject = 3;
+  weekday.Weekday Weekday = 4;
+  color.Color Color = 5;
+  google.protobuf.Duration StartsAt = 6;
+  google.protobuf.Duration EndsAt = 7;
+  google.protobuf.StringValue ChangeOn = 8;
+  google.protobuf.StringValue IrrelevantSince = 9;
+  repeated string TeacherIds = 10;
+  repeated room.Room Rooms = 11;
+}
+
+message ClassDetailBase {
+  int32 Id = 1;
+  subject.Subject Subject = 2;
+  google.protobuf.Duration StartsAt = 3;
+  google.protobuf.Duration EndsAt = 4;
+  google.protobuf.StringValue ChangeOn = 5;
+  repeated room.Room Rooms = 8;
+  int32 Order = 9;
+}
+
+message StudentClassDetail {
+  int32 Id = 1;
+  subject.Subject Subject = 2;
+  google.protobuf.Duration StartsAt = 3;
+  google.protobuf.Duration EndsAt = 4;
+  google.protobuf.StringValue ChangeOn = 5;
+  repeated room.Room Rooms = 8;
+  repeated string TeacherIds = 9;
+  int32 Order = 10;
+}
+
+message TeacherClassDetail {
+  int32 Id = 1;
+  subject.Subject Subject = 2;
+  google.protobuf.Duration StartsAt = 3;
+  google.protobuf.Duration EndsAt = 4;
+  google.protobuf.StringValue ChangeOn = 5;
+  repeated room.Room Rooms = 8;
+  int32 GroupId = 9;
+  int32 Order = 10;
+}
+
+message StudentColorClasses {
+  color.Color Color = 1;
+  repeated StudentClassDetail Classes = 2;
+}
+
+message StudentColorClassesWithWeekday {
+  color.Color Color = 1;
+  repeated StudentClassDetail Classes = 2;
+}
+
+message TeacherColorClasses {
+  color.Color Color = 1;
+  repeated TeacherClassDetail Classes = 2;
+}
+
+message StudentWeekdayColorClassesDto {
+  weekday.Weekday Weekday = 1;
+  repeated StudentColorClasses Classes = 2;
+}
+
+message TeacherWeekdayColorClassesDto {
+  weekday.Weekday Weekday = 1;
+  repeated TeacherColorClasses Classes = 2;
+}
+
+message CreateClassRequest {
+  int32 GroupId = 2;
+  int32 SubjectId = 3;
+  int32 WeekdayId = 4;
+  google.protobuf.Int32Value ColorId = 5;
+  google.protobuf.Duration StartsAt = 6;
+  google.protobuf.Duration EndsAt = 7;
+  google.protobuf.StringValue ChangeOn = 8;
+  repeated string TeacherIds = 10;
+  repeated int32 RoomIds = 11;
+}
+
+message CreateClassResponse { Class Class = 1; }
+
+message UpdateClassRequest {
+  int32 ClassId = 1;
+  int32 GroupId = 2;
+  int32 SubjectId = 3;
+  int32 WeekdayId = 4;
+  google.protobuf.Int32Value ColorId = 5;
+  google.protobuf.Duration StartsAt = 6;
+  google.protobuf.Duration EndsAt = 7;
+  google.protobuf.StringValue ChangeOn = 8;
+  repeated string TeacherIds = 10;
+  repeated int32 RoomIds = 11;
+}
+
+message UpdateClassResponse { Class Class = 1; }
+
+message GetClassByIdRequest { int32 Id = 1; }
+
+message GetClassByIdResponse { Class Class = 1; }
+
+message DeleteClassRequest { int32 Id = 1; }
+
+message DeleteClassResponse { Class Class = 1; }
+
+message GetClassesOnCurrentDateRequest { int32 GroupId = 1; }
+message GetClassesOnCurrentDateForStudentResponse {
+  int32 GroupId = 1;
+  weekday.Weekday Weekday = 2;
+  repeated StudentColorClasses Classes = 3;
+}
+message GetClassesOnCurrentDateForTeacherRequest { string TeacherId = 1; }
+message GetClassesOnCurrentDateForTeacherResponse {
+  repeated TeacherColorClasses Classes = 1;
+  weekday.Weekday Weekday = 2;
+  string TeacherId = 3;
+}
+
+message GetClassesForWeekForStudentRequest { int32 GroupId = 1; }
+message GetClassesForWeekForStudentResponse {
+  int32 GroupId = 1;
+  repeated StudentWeekdayColorClassesDto Classes = 2;
+}
+
+message GetClassesForWeekForTeacherRequest { string TeacherId = 1; }
+message GetClassesForWeekForTeacherResponse {
+  string TeacherId = 1;
+  repeated TeacherWeekdayColorClassesDto Classes = 2;
+}

@@ -8,10 +8,11 @@ services:
       dockerfile: ScheduleService.API/Dockerfile
     networks:
       - local
+      - global_network
     environment:
       - ASPNETCORE_HTTP_PORTS=8084
       - ASPNETCORE_HTTPS_PORTS=8085
-      - ASPNETCORE_ENVIRONMENT=Developments
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=youtube
     volumes:
@@ -32,6 +33,13 @@ services:
       retries: 3
     networks:
       - local
+    volumes:
+      - posgres_data:/var/lib/postgresql/data
 networks:
   local:
     driver: bridge
+  global_network:
+    external: true
+volumes:
+  posgres_data:
+    driver: local

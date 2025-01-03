@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package subject;
+
+import "google/protobuf/wrappers.proto";
+import "Protos/shared.proto";
+
+service SubjectService {
+  rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
+  rpc GetSubjectById(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
+  rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
+  rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
+  rpc GetSubjcts(GetSubjctsRequest) returns (GetSubjectsResponse);
+}
+
+message Subject {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue Abbreviation = 3;
+}
+
+message CreateSubjectRequest {
+  string Name = 1;
+  google.protobuf.StringValue Abbreviation = 2;
+}
+
+message CreateSubjectResponse { Subject Subject = 1; }
+
+message GetSubjectByIdRequest { int32 Id = 1; }
+
+message GetSubjectByIdResponse { Subject Subject = 1; }
+
+message UpdateSubjectRequest {
+  int32 Id = 1;
+  string Name = 2;
+  google.protobuf.StringValue Abbreviation = 3;
+}
+
+message UpdateSubjectResponse { Subject Subject = 1; }
+
+message DeleteSubjectRequest { int32 Id = 1; }
+message DeleteSubjectResponse { Subject Subject = 1; }
+
+enum SubjectFilterState {
+  Name = 0;
+  FullName = 1;
+}
+
+message SubjectFilter {
+  google.protobuf.StringValue SearchString = 1;
+  SubjectFilterState FilterBy = 2;
+  OrderState OrderState = 3;
+}
+
+message GetSubjctsRequest {
+  SubjectFilter Filter = 1;
+  PaginationParameters PaginationParameters = 2;
+}
+message GetSubjectsResponse {
+  repeated Subject Subjects = 1;
+  int32 LastPage = 2;
+}

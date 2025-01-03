@@ -1,0 +1,101 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "UserServiceClient";
+
+package Speciality;
+
+import "google/protobuf/wrappers.proto";
+import "Services/UserService/Protos/shared.proto";
+
+service SpecialityService {
+  rpc CreateSpeciality(CreateSpecialityRequest) returns (SpecialityShortInfo);
+  rpc DeleteSpecialities(DeleteSpecialitiesRequest)
+      returns (DeleteSpecialitiesResponse);
+  rpc SoftDeleteSpecialities(SoftDeleteSpecialitiesRequest)
+      returns (SoftDeleteSpecialitiesResponse);
+  rpc RecoverySpecialities(RecoverySpecialitiesRequest)
+      returns (RecoverySpecialitiesResponse);
+  rpc EditSpeciality(EditSpecialityRequest) returns (SpecialityShortInfo);
+  rpc GetSpecialityById(GetSpecialityByIdRequest) returns (SpecialityModel);
+  rpc GetSpecialities(GetSpecialitiesRequest) returns (GetSpecialitiesResponse);
+}
+
+message SpecialityModel {
+  int32 Id = 1;
+  string Name = 2;
+  string Abbreviation = 3;
+  double Cost = 4;
+  uint32 DurationMonths = 5;
+  bool IsDeleted = 6;
+}
+
+message SpecialityShortInfo {
+  int32 Id = 1;
+  string Name = 2;
+}
+
+message SpecialityViewModel {
+  int32 Id = 1;
+  string Name = 2;
+  string Abbreviation = 3;
+}
+
+message CreateSpecialityRequest {
+  string Name = 1;
+  string Abbreviation = 2;
+  double Cost = 3;
+  uint32 DurationMonths = 4;
+}
+
+message DeleteSpecialitiesRequest { repeated int32 Ids = 1; }
+
+message DeleteSpecialitiesResponse {
+  repeated SpecialityShortInfo Specialities = 1;
+}
+
+message SoftDeleteSpecialitiesRequest { repeated int32 Ids = 1; }
+
+message SoftDeleteSpecialitiesResponse {
+  repeated SpecialityShortInfo Specialities = 1;
+}
+
+message RecoverySpecialitiesRequest { repeated int32 Ids = 1; }
+
+message RecoverySpecialitiesResponse {
+  repeated SpecialityShortInfo Specialities = 1;
+}
+
+message EditSpecialityRequest {
+  int32 Id = 1;
+  string Name = 2;
+  string Abbreavation = 3;
+  double Cost = 4;
+  uint32 DurationMonths = 5;
+  bool IsDeleted = 6;
+}
+
+message GetSpecialityByIdRequest { int32 Id = 1; }
+
+enum SpecialitySortState {
+  NameAsc = 0;
+  NameDesc = 1;
+  AbbreviationAsc = 2;
+  AbbreviationDesc = 3;
+  CostAsc = 4;
+  CostDesc = 5;
+  DurationMonthsAsc = 6;
+  DurationMonthsDesc = 7;
+}
+
+message GetSpecialitiesRequest {
+  google.protobuf.StringValue SearchString = 1;
+  int32 Page = 2;
+  int32 PageSize = 3;
+  SpecialitySortState SortState = 4;
+  DeletedStatus DeletedStatus = 5;
+}
+
+message GetSpecialitiesResponse {
+  repeated SpecialityViewModel Specialities = 1;
+  int32 LastPage = 2;
+}
