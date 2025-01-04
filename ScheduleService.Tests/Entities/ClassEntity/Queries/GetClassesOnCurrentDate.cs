@@ -6,6 +6,7 @@ using ScheduleService.Application.Contracts.Services;
 using ScheduleService.Application.Contracts.UserService.Group;
 using ScheduleService.Application.Contracts.UserService.Group.Dto.Responses;
 using ScheduleService.Application.Contracts.UserService.Teacher;
+using ScheduleService.Application.Contracts.UserService.Teacher.dto.responses;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents;
@@ -65,14 +66,25 @@ public class GetClassesOnCurrentDate
         var (classes, weekday) = SetupClassService<TeacherClassDetailDto>();
 
         var query = _fixture.Create<GetClassesOnCurrentDateForTeacherQuery>();
-        var handler = new GetClassesOnCurrentDateForTeacherQueryHandler(_mockClassService.Object);
+
+        var teacher = _fixture.Build<TeacherDto>().With(x => x.Id, query.TeacherId).Create();
+
+        _mockTeacherService.Setup(x => x.GetTeacherById(query.TeacherId)).ReturnsAsync(teacher);
+
+        var handler = new GetClassesOnCurrentDateForTeacherQueryHandler(
+            _mockClassService.Object,
+            _mockGroupService.Object,
+            _mockTeacherService.Object
+        );
 
         var result = await handler.Handle(query, default);
+
+        _mockTeacherService.Verify(x => x.GetTeacherById(query.TeacherId), Times.Once());
 
         Assert<TeacherClassDetailDto>();
 
         result.Classes.Should().BeEquivalentTo(classes);
-        result.TeacherId.Should().Be(query.TeacherId);
+        result.Teacher.Id.Should().Be(query.TeacherId);
         result.Weekday.Should().BeEquivalentTo(weekday);
     }
 
