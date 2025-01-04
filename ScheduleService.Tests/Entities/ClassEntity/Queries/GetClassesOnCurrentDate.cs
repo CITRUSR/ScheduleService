@@ -3,6 +3,9 @@ using FluentAssertions;
 using Moq;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.Contracts.Services;
+using ScheduleService.Application.Contracts.UserService.Group;
+using ScheduleService.Application.Contracts.UserService.Group.Dto.Responses;
+using ScheduleService.Application.Contracts.UserService.Teacher;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents;
@@ -16,10 +19,14 @@ namespace ScheduleService.Tests.Entities.ClassEntity.Queries;
 public class GetClassesOnCurrentDate
 {
     private readonly Mock<IClassService> _mockClassService;
+    private readonly Mock<IGroupService> _mockGroupService;
+    private readonly Mock<ITeacherService> _mockTeacherService;
     private readonly Fixture _fixture;
 
     public GetClassesOnCurrentDate()
     {
+        _mockTeacherService = new Mock<ITeacherService>();
+        _mockGroupService = new Mock<IGroupService>();
         _mockClassService = new Mock<IClassService>();
         _fixture = new Fixture();
     }
@@ -30,14 +37,25 @@ public class GetClassesOnCurrentDate
         var (classes, weekday) = SetupClassService<StudentClassDetailDto>();
 
         var query = _fixture.Create<GetClassesOnCurrentDateForStudentQuery>();
-        var handler = new GetClassesOnCurrentDateForStudentQueryHandler(_mockClassService.Object);
+
+        var group = _fixture.Build<GroupDto>().With(x => x.Id, query.GroupId).Create();
+
+        _mockGroupService.Setup(x => x.GetGroupById(query.GroupId)).ReturnsAsync(group);
+
+        var handler = new GetClassesOnCurrentDateForStudentQueryHandler(
+            _mockClassService.Object,
+            _mockTeacherService.Object,
+            _mockGroupService.Object
+        );
 
         var result = await handler.Handle(query, default);
+
+        _mockGroupService.Verify(x => x.GetGroupById(query.GroupId), Times.Once());
 
         Assert<StudentClassDetailDto>();
 
         result.Classes.Should().BeEquivalentTo(classes);
-        result.GroupId.Should().Be(query.GroupId);
+        result.Group.Id.Should().Be(query.GroupId);
         result.Weekday.Should().BeEquivalentTo(weekday);
     }
 

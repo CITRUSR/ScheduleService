@@ -76,7 +76,7 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
         return new GetClassesOnCurrentDateForStudentResponse
         {
             Classes = { result.Classes.Adapt<List<StudentColorClasses>>() },
-            GroupId = result.GroupId,
+            Group = result.Group.Adapt<GroupViewModel>(),
             Weekday = result.Weekday.Adapt<Weekday>()
         };
     }
@@ -109,7 +109,7 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
         return new GetClassesForWeekForStudentResponse
         {
             Classes = { result.Classes.Adapt<List<StudentWeekdayColorClassesDto>>() },
-            GroupId = result.GroupId
+            Group = result.Group.Adapt<GroupViewModel>()
         };
     }
 

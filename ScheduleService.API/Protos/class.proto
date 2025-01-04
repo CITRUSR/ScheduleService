@@ -10,6 +10,8 @@ import "Protos/room.proto";
 import "Protos/subject.proto";
 import "Protos/weekday.proto";
 import "Protos/color.proto";
+import "Protos/teacherUi.proto";
+import "Protos/groupUi.proto";
 
 service ClassService {
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
@@ -58,7 +60,7 @@ message StudentClassDetail {
   google.protobuf.Duration EndsAt = 4;
   google.protobuf.StringValue ChangeOn = 5;
   repeated room.Room Rooms = 8;
-  repeated string TeacherIds = 9;
+  repeated TeacherUi.TeacherViewModel Teachers = 9;
   int32 Order = 10;
 }
 
@@ -137,7 +139,7 @@ message DeleteClassResponse { Class Class = 1; }
 
 message GetClassesOnCurrentDateRequest { int32 GroupId = 1; }
 message GetClassesOnCurrentDateForStudentResponse {
-  int32 GroupId = 1;
+  GroupUi.GroupViewModel Group = 1;
   weekday.Weekday Weekday = 2;
   repeated StudentColorClasses Classes = 3;
 }
@@ -150,7 +152,7 @@ message GetClassesOnCurrentDateForTeacherResponse {
 
 message GetClassesForWeekForStudentRequest { int32 GroupId = 1; }
 message GetClassesForWeekForStudentResponse {
-  int32 GroupId = 1;
+  GroupUi.GroupViewModel Group = 1;
   repeated StudentWeekdayColorClassesDto Classes = 2;
 }
 
