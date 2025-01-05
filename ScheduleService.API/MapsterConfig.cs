@@ -1,6 +1,9 @@
+using System.Globalization;
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using Mapster;
+using ScheduleService.Application.Contracts.UserService.Group.Dto.Responses;
+using ScheduleService.Application.Contracts.UserService.Teacher.dto.responses;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.CreateClass;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 using ScheduleService.Application.CQRS.CurrentWeekdayEntity.Commands.CreateCurrentWeekday;
@@ -21,6 +24,7 @@ public static class MapsterConfig
         ConfigureCurrentWeekdayRequests();
         ConfigureCurrentWeekdayEntity();
         ConfigureClassRequests();
+        ConfigureUserServiceModels();
     }
 
     private static void ConfigureClassRequests()
@@ -63,22 +67,6 @@ public static class MapsterConfig
             .Map(dest => dest.Subject, src => src.Subject)
             .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
             .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration());
-
-        TypeAdapterConfig<
-            Application.CQRS.ClassEntity.Queries.GetClasses.GetClassOnCurrentDateForStudents.GetClassesOnCurrentDateForStudentResponse,
-            GetClassesOnCurrentDateForStudentResponse
-        >
-            .NewConfig()
-            .Map(dest => dest.GroupId, src => src.GroupId)
-            .Map(dest => dest.Weekday, src => src.Weekday)
-            .Map(dest => dest.Classes, src => src.Classes);
-
-        TypeAdapterConfig<
-            Application.CQRS.ClassEntity.Queries.GetClasses.Student.StudentClassDetailDto,
-            StudentClassDetail
-        >
-            .NewConfig()
-            .Map(dest => dest.TeacherIds, src => src.TeacherIds.Select(x => x.ToString()).ToList());
     }
 
     private static void ConfigureCurrentWeekdayRequests()
@@ -99,5 +87,47 @@ public static class MapsterConfig
         TypeAdapterConfig<Domain.Entities.CurrentWeekday, CurrentWeekday>
             .NewConfig()
             .Map(dest => dest.Interval, src => src.Interval.ToDuration());
+    }
+
+    private static void ConfigureUserServiceModels()
+    {
+        const string UserServiceTimeFormat = "MM/dd/yyyy HH:mm:ss";
+
+        TypeAdapterConfig<UserServiceClient.GroupModel, GroupDto>
+            .NewConfig()
+            .Map(
+                dest => dest.StartedAt,
+                src =>
+                    DateTime.ParseExact(
+                        src.StartedAt,
+                        UserServiceTimeFormat,
+                        CultureInfo.InvariantCulture
+                    )
+            )
+            .Map(
+                dest => dest.GraduatedAt,
+                src =>
+                    src.GraduatedAt == null
+                        ? (DateTime?)null
+                        : DateTime.ParseExact(
+                            src.GraduatedAt,
+                            UserServiceTimeFormat,
+                            CultureInfo.InvariantCulture
+                        )
+            );
+
+        TypeAdapterConfig<UserServiceClient.TeacherModel, TeacherDto>
+            .NewConfig()
+            .Map(
+                dest => dest.FiredAt,
+                src =>
+                    src.FiredAt == null
+                        ? (DateTime?)null
+                        : DateTime.ParseExact(
+                            src.FiredAt,
+                            UserServiceTimeFormat,
+                            CultureInfo.InvariantCulture
+                        )
+            );
     }
 }

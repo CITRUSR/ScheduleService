@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package TeacherUi;
+
+import "google/protobuf/wrappers.proto";
+
+message TeacherViewModel {
+  string Id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  google.protobuf.StringValue PatronymicName = 4;
+}

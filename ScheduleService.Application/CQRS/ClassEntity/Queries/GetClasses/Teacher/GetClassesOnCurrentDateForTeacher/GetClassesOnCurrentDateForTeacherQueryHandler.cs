@@ -1,18 +1,28 @@
+using Mapster;
 using MediatR;
 using ScheduleService.Application.Common.Extensions;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
 using ScheduleService.Application.Contracts.Services;
+using ScheduleService.Application.Contracts.UserService.Group;
+using ScheduleService.Application.Contracts.UserService.Teacher;
+using ScheduleService.Application.Contracts.UserService.Teacher.dto.responses;
 using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.Teacher;
 
 namespace ScheduleService.Application.CQRS.ClassEntity.Queries.GetClasses.GetClassesOnCurrentDateForTeacher;
 
-public class GetClassesOnCurrentDateForTeacherQueryHandler(IClassService classService)
+public class GetClassesOnCurrentDateForTeacherQueryHandler(
+    IClassService classService,
+    IGroupService groupService,
+    ITeacherService teacherService
+)
     : IRequestHandler<
         GetClassesOnCurrentDateForTeacherQuery,
         GetClassesOnCurrentDateForTeacherResponse
     >
 {
     private readonly IClassService _classService = classService;
+    private readonly IGroupService _groupService = groupService;
+    private readonly ITeacherService _teacherService = teacherService;
 
     public async Task<GetClassesOnCurrentDateForTeacherResponse> Handle(
         GetClassesOnCurrentDateForTeacherQuery request,
@@ -26,11 +36,18 @@ public class GetClassesOnCurrentDateForTeacherQueryHandler(IClassService classSe
             weekdayId
         );
 
+        foreach (var classDetails in classes.Select(x => x.Classes))
+        {
+            await classDetails.LoadGroups(_groupService);
+        }
+
+        var teacher = await _teacherService.GetTeacherById(request.TeacherId);
+
         return new GetClassesOnCurrentDateForTeacherResponse
         {
             Classes = classes,
             Weekday = weekday,
-            TeacherId = request.TeacherId
+            Teacher = teacher.Adapt<TeacherViewModel>()
         };
     }
 }
