@@ -2,9 +2,9 @@ namespace ScheduleService.Application.Common.Exceptions;
 
 public class ValidationException : Exception
 {
-    public List<ValidationError> Errors { get; set; }
+    public ValidationError Errors { get; set; }
 
-    public ValidationException(List<ValidationError> errors)
+    public ValidationException(ValidationError errors)
     {
         Errors = errors;
     }
