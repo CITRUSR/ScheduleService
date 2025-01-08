@@ -10,8 +10,8 @@ services:
       - local
       - global_network
     environment:
-      - ASPNETCORE_HTTP_PORTS=8084
-      - ASPNETCORE_HTTPS_PORTS=8085
+      - ASPNETCORE_HTTP_PORTS=5055
+      - ASPNETCORE_HTTPS_PORTS=5050
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=youtube
