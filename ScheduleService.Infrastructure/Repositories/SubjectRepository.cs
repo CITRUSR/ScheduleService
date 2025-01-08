@@ -84,9 +84,13 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
     {
         using var connection = _dbContext.CreateConnection();
 
+        var parameters = new DynamicParameters();
+
+        parameters.Add("SubjectId", id);
+
         var subject = await connection.QueryFirstOrDefaultAsync<Subject>(
             SubjectQueries.GetSubjectById,
-            new { id }
+            parameters
         );
 
         return subject;
