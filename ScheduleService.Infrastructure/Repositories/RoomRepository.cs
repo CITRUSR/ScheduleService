@@ -31,20 +31,14 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
     {
         using var connection = _dbContext.CreateConnection();
 
-        StringBuilder queryBuilder = new StringBuilder();
-
-        queryBuilder.Append(RoomQueries.GetRooms);
+        string searchCondition = "";
 
         if (!string.IsNullOrWhiteSpace(filter.SearchString))
         {
-            queryBuilder.Append(@" WHERE LOWER(CONCAT(name, full_name)) LIKE LOWER(@SearchString)");
+            searchCondition = " WHERE LOWER(CONCAT(name, full_name)) LIKE LOWER(@SearchString)";
         }
 
         var searchString = $"%{filter.SearchString}%";
-
-        var countQuery = queryBuilder
-            .ToString()
-            .Replace(RoomQueries.GetRooms, "SELECT COUNT(*) FROM rooms");
 
         string orderedCol = filter.FilterBy switch
         {
@@ -52,27 +46,37 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
             RoomFilterState.FullName => "full_name",
         };
 
-        queryBuilder.Append($" ORDER BY {orderedCol} {filter.OrderState}");
+        var offset = (paginationParameters.Page - 1) * paginationParameters.PageSize;
 
-        queryBuilder.Append($" LIMIT {paginationParameters.PageSize}");
-
-        queryBuilder.Append(
-            $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
+        var query = string.Format(
+            RoomQueries.GetRooms,
+            searchCondition,
+            orderedCol,
+            filter.OrderState
         );
 
-        using var multy = await connection.QueryMultipleAsync(
-            $"{countQuery}; {queryBuilder};",
-            new { SearchString = searchString }
+        var parameters = new DynamicParameters();
+
+        parameters.Add("@SearchString", searchString);
+        parameters.Add("@Limit", paginationParameters.PageSize);
+        parameters.Add("@Offset", offset);
+
+        int totalCount = 0;
+
+        var rooms = await connection.QueryAsync<Room, long, Room>(
+            query,
+            (rooms, count) =>
+            {
+                totalCount = (int)count;
+                return rooms;
+            },
+            parameters,
+            splitOn: "totalCount"
         );
-
-        var totalCountTask = multy.ReadSingleOrDefaultAsync<int>();
-        var roomsTask = multy.ReadAsync<Room>();
-
-        await Task.WhenAll(roomsTask, totalCountTask);
 
         return new PagedList<Room>(
-            [.. await roomsTask],
-            await totalCountTask,
+            [.. rooms],
+            totalCount,
             paginationParameters.Page,
             paginationParameters.PageSize
         );

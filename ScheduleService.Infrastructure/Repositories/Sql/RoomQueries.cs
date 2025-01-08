@@ -28,7 +28,15 @@ public class RoomQueries
         ";
     public static string GetRooms =
         @"
-            SELECT * FROM rooms
+            WITH filtered_rooms AS(
+                SELECT id, name, full_name AS FullName FROM rooms
+                {0}
+            )
+            SELECT id, name, FullName, COUNT(*) OVER() AS totalCount
+            FROM filtered_rooms
+            ORDER BY {1} {2}
+            LIMIT @Limit
+            OFFSET @Offset
         ";
 
     public static string GetRoomsById =
