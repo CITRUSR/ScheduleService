@@ -6,7 +6,7 @@ public class CreateSubjectCommandValidator : AbstractValidator<CreateSubjectComm
 {
     public CreateSubjectCommandValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(10);
-        RuleFor(x => x.Abbreviation).MaximumLength(128);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.Abbreviation).MaximumLength(10);
     }
 }
