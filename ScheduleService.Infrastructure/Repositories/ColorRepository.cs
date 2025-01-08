@@ -33,9 +33,13 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
     public async Task<Color?> GetByIdAsync(int id)
     {
         using var connection = _dbContext.CreateConnection();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ColorId", id);
+
         var color = await connection.QueryFirstOrDefaultAsync<Color>(
             ColorQueries.GetColorById,
-            new { id }
+            parameters
         );
         return color;
     }
