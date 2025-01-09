@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using Grpc.Core;
+using MediatR;
 using Moq;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Common.Exceptions.ClassEntity;
@@ -11,6 +12,7 @@ using ScheduleService.Application.Contracts.UserService.Teacher;
 using ScheduleService.Application.Contracts.UserService.Teacher.dto.responses;
 using ScheduleService.Application.CQRS.ClassEntity;
 using ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClassById;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Tests.Entities.ClassEntity.Commands;
@@ -20,6 +22,7 @@ public class UpdateClass
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IGroupService> _mockGroupService;
     private readonly Mock<ITeacherService> _mockTeacherService;
+    private readonly Mock<IMediator> _mockMediator;
     private readonly UpdateClassCommandHandler _handler;
     private readonly UpdateClassCommand _command;
     private readonly Fixture _fixture;
@@ -29,11 +32,13 @@ public class UpdateClass
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockGroupService = new Mock<IGroupService>();
         _mockTeacherService = new Mock<ITeacherService>();
+        _mockMediator = new Mock<IMediator>();
         _fixture = new Fixture();
         _handler = new UpdateClassCommandHandler(
             _mockUnitOfWork.Object,
             _mockGroupService.Object,
-            _mockTeacherService.Object
+            _mockTeacherService.Object,
+            _mockMediator.Object
         );
         _command = _fixture.Create<UpdateClassCommand>();
     }
@@ -46,6 +51,7 @@ public class UpdateClass
         var @class = _fixture.Create<Class>();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         _mockTeacherService
             .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
@@ -76,6 +82,11 @@ public class UpdateClass
             Times.Once()
         );
 
+        _mockMediator.Verify(
+            x => x.Send(It.IsAny<GetClassByIdQuery>(), It.IsAny<CancellationToken>()),
+            Times.Once()
+        );
+
         _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Once());
 
         result.Id.Should().Be(@class.Id);
@@ -90,6 +101,7 @@ public class UpdateClass
             .Create();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
@@ -105,6 +117,7 @@ public class UpdateClass
             .Create();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
@@ -120,6 +133,7 @@ public class UpdateClass
             .Create();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
@@ -134,6 +148,7 @@ public class UpdateClass
         var dependencies = _fixture.Build<ClassDependenciesDto>().With(x => x.Rooms, []).Create();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         Func<Task> act = async () =>
             await _handler.Handle(_command with { RoomIds = [.. roomsIds] }, default);
@@ -149,6 +164,7 @@ public class UpdateClass
         var dependencies = _fixture.Create<ClassDependenciesDto>();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         _mockTeacherService
             .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
@@ -166,6 +182,7 @@ public class UpdateClass
         var dependencies = _fixture.Create<ClassDependenciesDto>();
 
         SetupGetClassDependencies(dependencies);
+        SetupMediator();
 
         _mockTeacherService
             .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
@@ -183,20 +200,6 @@ public class UpdateClass
     [Fact]
     public async Task UpdateClass_ShouldBe_ClassNotFoundException()
     {
-        var dependencies = _fixture.Create<ClassDependenciesDto>();
-
-        SetupGetClassDependencies(dependencies);
-
-        _mockTeacherService
-            .Setup(x => x.GetTeacherById(It.IsAny<Guid>()))
-            .ReturnsAsync(new TeacherDto());
-
-        _mockGroupService.Setup(x => x.GetGroupById(It.IsAny<int>())).ReturnsAsync(new GroupDto());
-
-        _mockUnitOfWork
-            .Setup(x => x.ClassRepository.UpdateAsync(It.IsAny<UpdateClassDto>()))
-            .ReturnsAsync((Class?)null);
-
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
         await act.Should().ThrowAsync<ClassNotFoundException>();
@@ -207,5 +210,14 @@ public class UpdateClass
         _mockUnitOfWork
             .Setup(x => x.ClassRepository.GetClassDependencies(It.IsAny<GetClassDependenciesDto>()))
             .ReturnsAsync(dto);
+    }
+
+    private void SetupMediator()
+    {
+        var @class = _fixture.Build<Class>().With(x => x.Id, _command.ClassId).Create();
+
+        _mockMediator
+            .Setup(x => x.Send(It.IsAny<GetClassByIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(@class);
     }
 }

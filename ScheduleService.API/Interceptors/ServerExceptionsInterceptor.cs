@@ -23,6 +23,8 @@ public class ServerExceptionsInterceptor : Interceptor
             Log.Error(ex.Message);
             switch (ex)
             {
+                case RpcException rex:
+                    throw rex;
                 case ValidationException ve:
                     throw new RpcException(
                         new Status(
@@ -31,18 +33,10 @@ public class ServerExceptionsInterceptor : Interceptor
                         )
                     );
                 case NotFoundException notFoundEx:
-                    throw new RpcException(
-                        new Status(
-                            StatusCode.NotFound,
-                            JsonConvert.SerializeObject(notFoundEx.Message)
-                        )
-                    );
+                    throw new RpcException(new Status(StatusCode.NotFound, notFoundEx.Message));
                 case AlreadyExistsException alreadyExistsEx:
                     throw new RpcException(
-                        new Status(
-                            StatusCode.AlreadyExists,
-                            JsonConvert.SerializeObject(alreadyExistsEx.Message)
-                        )
+                        new Status(StatusCode.AlreadyExists, alreadyExistsEx.Message)
                     );
                 default:
                     throw new RpcException(

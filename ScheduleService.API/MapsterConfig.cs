@@ -24,6 +24,7 @@ public static class MapsterConfig
         ConfigureCurrentWeekdayRequests();
         ConfigureCurrentWeekdayEntity();
         ConfigureClassRequests();
+        ConfigureClassEntities();
         ConfigureUserServiceModels();
     }
 
@@ -65,6 +66,30 @@ public static class MapsterConfig
             .Map(dest => dest.ChangeOn, src => src.ChangeOn)
             .Map(dest => dest.Rooms, src => src.Rooms)
             .Map(dest => dest.Subject, src => src.Subject)
+            .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
+            .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration());
+    }
+
+    private static void ConfigureClassEntities()
+    {
+        TypeAdapterConfig<
+            Application.CQRS.ClassEntity.Queries.GetClasses.Student.StudentClassDetailDto,
+            StudentClassDetail
+        >
+            .NewConfig()
+            .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
+            .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration());
+
+        TypeAdapterConfig<
+            Application.CQRS.ClassEntity.Queries.GetClasses.Teacher.TeacherClassDetailDto,
+            TeacherClassDetail
+        >
+            .NewConfig()
+            .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
+            .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration());
+
+        TypeAdapterConfig<Domain.Entities.Class, Class>
+            .NewConfig()
             .Map(dest => dest.StartsAt, src => src.StartsAt.ToDuration())
             .Map(dest => dest.EndsAt, src => src.EndsAt.ToDuration());
     }

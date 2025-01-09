@@ -134,22 +134,31 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         parameters.Add("EndsAt", dto.EndsAt);
         parameters.Add("ChangeOn", dto.ChangeOn);
 
-        var classes = await connection.QueryAsync<Class, Subject, Weekday, string, string, Class>(
+        var classes = await connection.QueryAsync<
+            Class,
+            Color?,
+            Subject,
+            Weekday,
+            string,
+            string,
+            Class
+        >(
             string.Format(
                 ClassQueries.InsertClass,
                 string.Join(", ", dto.TeacherIds.Select(guid => $"'{guid}'::uuid")),
                 string.Join(", ", dto.RoomIds)
             ),
-            (@cl, subject, weekday, teacherIds, rooms) =>
+            (@cl, color, subject, weekday, teacherIds, rooms) =>
             {
                 @cl.Subject = subject;
                 @cl.Weekday = weekday;
+                @cl.Color = color;
                 @cl.TeacherIds = JsonConvert.DeserializeObject<List<Guid>>(teacherIds);
                 @cl.Rooms = JsonConvert.DeserializeObject<List<Room>>(rooms);
                 return @cl;
             },
             parameters,
-            splitOn: "subjectId, weekdayId, teachers, rooms"
+            splitOn: "id, subjectId, weekdayId, teachers, rooms"
         );
 
         var @class = classes.FirstOrDefault();
@@ -186,7 +195,7 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         return new ClassDependenciesDto(colorTask, subjectTask, weekdayTask, [.. roomsCountTask]);
     }
 
-    public async Task<Class?> UpdateAsync(UpdateClassDto dto)
+    public async Task<Class> UpdateAsync(UpdateClassDto dto)
     {
         using var connection = _dbContext.CreateConnection();
 

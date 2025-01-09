@@ -6,8 +6,8 @@ CREATE TABLE rooms (
 
 CREATE TABLE subjects (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(10) NOT NULL UNIQUE,
-    abbreviation VARCHAR(128)
+    name VARCHAR(128) NOT NULL UNIQUE,
+    abbreviation VARCHAR(10)
 );
 
 CREATE TABLE weekdays (

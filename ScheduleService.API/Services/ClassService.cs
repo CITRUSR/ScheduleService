@@ -65,7 +65,7 @@ public class ClassService(IMediator mediator) : ScheduleService.ClassService.Cla
     }
 
     public override async Task<GetClassesOnCurrentDateForStudentResponse> GetClassesOnCurrentDateForStudent(
-        GetClassesOnCurrentDateRequest request,
+        GetClassesOnCurrentDateForStudentRequest request,
         ServerCallContext context
     )
     {

@@ -18,7 +18,8 @@ service ClassService {
   rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse);
   rpc GetClassById(GetClassByIdRequest) returns (GetClassByIdResponse);
   rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse);
-  rpc GetClassesOnCurrentDateForStudent(GetClassesOnCurrentDateRequest)
+  rpc GetClassesOnCurrentDateForStudent(
+      GetClassesOnCurrentDateForStudentRequest)
       returns (GetClassesOnCurrentDateForStudentResponse);
   rpc GetClassesOnCurrentDateForTeacher(
       GetClassesOnCurrentDateForTeacherRequest)
@@ -137,7 +138,7 @@ message DeleteClassRequest { int32 Id = 1; }
 
 message DeleteClassResponse { Class Class = 1; }
 
-message GetClassesOnCurrentDateRequest { int32 GroupId = 1; }
+message GetClassesOnCurrentDateForStudentRequest { int32 GroupId = 1; }
 message GetClassesOnCurrentDateForStudentResponse {
   GroupUi.GroupViewModel Group = 1;
   weekday.Weekday Weekday = 2;

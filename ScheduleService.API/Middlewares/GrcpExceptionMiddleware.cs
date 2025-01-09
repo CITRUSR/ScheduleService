@@ -20,7 +20,10 @@ public class GrcpExceptionMiddleware(RequestDelegate next)
             {
                 case ValidationException valEx:
                     throw new RpcException(
-                        new Status(StatusCode.InvalidArgument, JsonConvert.SerializeObject(valEx))
+                        new Status(
+                            StatusCode.InvalidArgument,
+                            JsonConvert.SerializeObject(new { valEx.Errors })
+                        )
                     );
             }
         }
