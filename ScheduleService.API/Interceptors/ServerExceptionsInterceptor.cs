@@ -23,6 +23,8 @@ public class ServerExceptionsInterceptor : Interceptor
             Log.Error(ex.Message);
             switch (ex)
             {
+                case RpcException rex:
+                    throw rex;
                 case ValidationException ve:
                     throw new RpcException(
                         new Status(
