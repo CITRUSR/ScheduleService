@@ -10,7 +10,7 @@ public interface IClassRepository
 {
     Task<Class> InsertAsync(CreateClassDto dto);
     Task<ClassDependenciesDto> GetClassDependencies(GetClassDependenciesDto dto);
-    Task<Class?> UpdateAsync(UpdateClassDto dto);
+    Task<Class> UpdateAsync(UpdateClassDto dto);
     Task<Class?> DeleteAsync(int id);
     Task<Class?> GetByIdAsync(int id);
     Task<List<Class>> GetAsync(IClassSpecification specification);

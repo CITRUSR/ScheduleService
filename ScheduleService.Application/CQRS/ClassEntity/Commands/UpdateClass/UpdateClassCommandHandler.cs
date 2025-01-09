@@ -6,6 +6,7 @@ using ScheduleService.Application.Contracts;
 using ScheduleService.Application.Contracts.UserService.Group;
 using ScheduleService.Application.Contracts.UserService.Teacher;
 using ScheduleService.Application.Contracts.UserService.Teacher.dto.responses;
+using ScheduleService.Application.CQRS.ClassEntity.Queries.GetClassById;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
@@ -13,15 +14,25 @@ namespace ScheduleService.Application.CQRS.ClassEntity.Commands.UpdateClass;
 public class UpdateClassCommandHandler(
     IUnitOfWork unitOfWork,
     IGroupService groupService,
-    ITeacherService teacherService
+    ITeacherService teacherService,
+    IMediator mediator
 ) : IRequestHandler<UpdateClassCommand, Class>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IGroupService _groupService = groupService;
     private readonly ITeacherService _teacherService = teacherService;
+    private readonly IMediator _mediator = mediator;
 
     public async Task<Class> Handle(UpdateClassCommand request, CancellationToken cancellationToken)
     {
+        var @class = await _mediator.Send(
+            new GetClassByIdQuery(request.ClassId),
+            cancellationToken
+        );
+
+        if (@class == null)
+            throw new ClassNotFoundException(request.ClassId);
+
         var depenceDto = request.Adapt<GetClassDependenciesDto>();
 
         var dependencies = await _unitOfWork.ClassRepository.GetClassDependencies(depenceDto);
@@ -56,9 +67,6 @@ public class UpdateClassCommandHandler(
         var updateClassDto = request.Adapt<UpdateClassDto>();
 
         var updatedClass = await _unitOfWork.ClassRepository.UpdateAsync(updateClassDto);
-
-        if (updatedClass == null)
-            throw new ClassNotFoundException(request.ClassId);
 
         _unitOfWork.CommitTransaction();
 

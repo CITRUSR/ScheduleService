@@ -195,7 +195,7 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         return new ClassDependenciesDto(colorTask, subjectTask, weekdayTask, [.. roomsCountTask]);
     }
 
-    public async Task<Class?> UpdateAsync(UpdateClassDto dto)
+    public async Task<Class> UpdateAsync(UpdateClassDto dto)
     {
         using var connection = _dbContext.CreateConnection();
 
