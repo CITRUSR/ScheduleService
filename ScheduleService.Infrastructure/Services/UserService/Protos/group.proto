@@ -33,6 +33,7 @@ message GroupModel {
   string StartedAt = 7;
   google.protobuf.StringValue GraduatedAt = 8;
   bool IsDeleted = 10;
+  string FullName = 11;
 }
 
 message GroupShortInfo {

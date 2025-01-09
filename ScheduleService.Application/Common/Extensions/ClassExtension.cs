@@ -12,10 +12,11 @@ public static class ClassExtension
         where TClassDetail : ClassDetailBase
     {
         var colorClasses = classes
-            .GroupBy(x => new { x.Color.Name, x.Color.Id })
+            .GroupBy(x => new { x.Color?.Name, x.Color?.Id })
             .Select(x => new ColorClassesDto<TClassDetail>
             {
-                Color = new Color() { Id = x.Key.Id, Name = x.Key.Name },
+                Color =
+                    x.Key.Id == null ? null : new Color { Id = x.Key.Id.Value, Name = x.Key.Name },
                 Classes = [.. x.Select(x => x.Adapt<TClassDetail>())]
             })
             .ToList();

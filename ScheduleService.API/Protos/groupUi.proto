@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package GroupUi;
+
+message GroupViewModel {
+  int32 Id = 1;
+  string FullName = 2;
+}
