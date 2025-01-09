@@ -55,10 +55,11 @@ public static class ClassQueries
             SELECT
                 inserted.id,
                 inserted.GroupId,
-                inserted.ColorId,
                 inserted.EndsAt,
                 inserted.StartsAt,
                 inserted.ChangeOn,
+                inserted.ColorId AS id,
+                colors.name,
                 subjects.id AS subjectId,
                 subjects.name,
                 subjects.abbreviation,
@@ -78,11 +79,14 @@ public static class ClassQueries
                 inserted_rooms ON inserted_rooms.class_fk = inserted.id
             JOIN
                 rooms ON inserted_rooms.room_fk = rooms.id
+            LEFT JOIN
+                colors ON colors.id = ColorId
             GROUP BY inserted.id,
                      subjects.id,
                      weekdays.id,
                      inserted.GroupId,
                      inserted.ColorId,
+                     colors.name,
                      inserted.EndsAt,
                      inserted.StartsAt,
                      inserted.ChangeOn;
