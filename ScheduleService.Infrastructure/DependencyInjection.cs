@@ -1,3 +1,4 @@
+using System.Data;
 using DbUp;
 using Grpc.Core;
 using Hangfire;
@@ -21,6 +22,13 @@ public static class DependencyInjection
     )
     {
         services.AddSingleton<IDbContext, DbContext>();
+        services.AddScoped(
+            (sp) =>
+            {
+                var dbContext = sp.GetRequiredService<IDbContext>();
+                return dbContext.CreateConnection();
+            }
+        );
 
         var connectionString = configuration.GetConnectionString("DbConnectionString");
         if (string.IsNullOrEmpty(connectionString))

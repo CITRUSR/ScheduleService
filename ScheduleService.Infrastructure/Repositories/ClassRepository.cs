@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using Newtonsoft.Json;
 using ScheduleService.Application.Common.Specifications.ClassEntity;
@@ -10,19 +11,17 @@ using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
-public class ClassRepository(IDbContext dbContext) : IClassRepository
+public class ClassRepository(IDbConnection dbConnection) : IClassRepository
 {
-    private readonly IDbContext _dbContext = dbContext;
+    private readonly IDbConnection _dbConnection = dbConnection;
 
     public async Task<Class?> DeleteAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
 
         parameters.Add("ClassId", id);
 
-        var classes = await connection.QueryAsync<
+        var classes = await _dbConnection.QueryAsync<
             Class,
             Subject,
             Weekday,
@@ -52,14 +51,12 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
 
     public async Task<List<Class>> GetAsync(IClassSpecification specification)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
 
         parameters.Add("LeftChangeDateLimiter", specification.LeftChangeDateLimiter);
         parameters.Add("RightChangeDateLimiter", specification.RightChangeDateLimiter);
 
-        var classes = await connection.QueryAsync<
+        var classes = await _dbConnection.QueryAsync<
             Class,
             Weekday,
             Subject,
@@ -87,13 +84,11 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
 
     public async Task<Class?> GetByIdAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
 
         parameters.Add("ClassId", id);
 
-        var classes = await connection.QueryAsync<
+        var classes = await _dbConnection.QueryAsync<
             Class,
             Subject,
             Weekday,
@@ -123,8 +118,6 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
 
     public async Task<Class> InsertAsync(CreateClassDto dto)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
         parameters.Add("GroupFk", dto.GroupId);
         parameters.Add("SubjectFk", dto.SubjectId);
@@ -134,7 +127,7 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         parameters.Add("EndsAt", dto.EndsAt);
         parameters.Add("ChangeOn", dto.ChangeOn);
 
-        var classes = await connection.QueryAsync<
+        var classes = await _dbConnection.QueryAsync<
             Class,
             Color?,
             Subject,
@@ -168,14 +161,12 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
 
     public async Task<ClassDependenciesDto> GetClassDependencies(GetClassDependenciesDto dto)
     {
-        using var connection = _dbContext.CreateConnection();
-
         DynamicParameters parameters = new DynamicParameters();
         parameters.Add("ColorId", dto.ColorId);
         parameters.Add("SubjectId", dto.SubjectId);
         parameters.Add("WeekdayId", dto.WeekdayId);
 
-        using var multy = await connection.QueryMultipleAsync(
+        using var multy = await _dbConnection.QueryMultipleAsync(
             $@"
             {(dto.ColorId != null ? ColorQueries.GetColorById : "")};
             {SubjectQueries.GetSubjectById};
@@ -197,8 +188,6 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
 
     public async Task<Class> UpdateAsync(UpdateClassDto dto)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
         parameters.Add("ClassId", dto.Id);
         parameters.Add("GroupFk", dto.GroupId);
@@ -209,7 +198,7 @@ public class ClassRepository(IDbContext dbContext) : IClassRepository
         parameters.Add("EndsAt", dto.EndsAt);
         parameters.Add("ChangeOn", dto.ChangeOn);
 
-        var classes = await connection.QueryAsync<
+        var classes = await _dbConnection.QueryAsync<
             Class,
             Subject,
             Weekday,

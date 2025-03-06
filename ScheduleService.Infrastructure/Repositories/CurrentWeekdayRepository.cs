@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
@@ -5,15 +6,13 @@ using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
-public class CurrentWeekdayRepository(IDbContext dbContext) : ICurrentWeekdayRepository
+public class CurrentWeekdayRepository(IDbConnection dbConnection) : ICurrentWeekdayRepository
 {
-    private readonly IDbContext _dbContext = dbContext;
+    private readonly IDbConnection _dbConnection = dbConnection;
 
     public async Task<CurrentWeekday?> GetAsync()
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var currentWeekday = await connection.QueryFirstOrDefaultAsync<CurrentWeekday>(
+        var currentWeekday = await _dbConnection.QueryFirstOrDefaultAsync<CurrentWeekday>(
             CurrentWeekdayQueries.GetCurrentWeekday
         );
 
@@ -22,9 +21,7 @@ public class CurrentWeekdayRepository(IDbContext dbContext) : ICurrentWeekdayRep
 
     public async Task<CurrentWeekday> InsertAsync(CurrentWeekday currentWeekday)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        int id = await connection.QuerySingleAsync<int>(
+        int id = await _dbConnection.QuerySingleAsync<int>(
             CurrentWeekdayQueries.InsertCurrentWeekday,
             new { currentWeekday.Color, currentWeekday.Interval }
         );
@@ -36,15 +33,13 @@ public class CurrentWeekdayRepository(IDbContext dbContext) : ICurrentWeekdayRep
 
     public async Task<CurrentWeekday?> UpdateAsync(CurrentWeekday currentWeekday)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var id = await connection.QueryAsync<int>(
+        var id = await _dbConnection.QueryAsync<int>(
             CurrentWeekdayQueries.UpdateCurrentWeekday,
             new
             {
                 currentWeekday.Color,
                 currentWeekday.Interval,
-                currentWeekday.UpdatedAt
+                currentWeekday.UpdatedAt,
             }
         );
 

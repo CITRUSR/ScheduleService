@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
@@ -5,15 +6,13 @@ using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
-public class ColorRepository(IDbContext dbContext) : IColorRepository
+public class ColorRepository(IDbConnection dbConnection) : IColorRepository
 {
-    private readonly IDbContext _dbContext = dbContext;
+    private readonly IDbConnection _dbConnection = dbConnection;
 
     public async Task<Color?> DeleteAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var color = await connection.QueryFirstOrDefaultAsync<Color>(
+        var color = await _dbConnection.QueryFirstOrDefaultAsync<Color>(
             ColorQueries.DeleteColor,
             new { id }
         );
@@ -23,21 +22,17 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
 
     public async Task<List<Color>> GetAllAsync()
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var colors = await connection.QueryAsync<Color>(ColorQueries.GetAllColors);
+        var colors = await _dbConnection.QueryAsync<Color>(ColorQueries.GetAllColors);
 
         return [.. colors];
     }
 
     public async Task<Color?> GetByIdAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
         parameters.Add("ColorId", id);
 
-        var color = await connection.QueryFirstOrDefaultAsync<Color>(
+        var color = await _dbConnection.QueryFirstOrDefaultAsync<Color>(
             ColorQueries.GetColorById,
             parameters
         );
@@ -46,8 +41,7 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
 
     public async Task<Color> InsertAsync(Color color)
     {
-        using var connection = _dbContext.CreateConnection();
-        var colorId = await connection.QuerySingleAsync<int>(
+        var colorId = await _dbConnection.QuerySingleAsync<int>(
             ColorQueries.InsertColor,
             new { color.Name }
         );
@@ -59,9 +53,7 @@ public class ColorRepository(IDbContext dbContext) : IColorRepository
 
     public async Task<Color?> UpdateAsync(Color color)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var affectedRows = await connection.ExecuteAsync(
+        var affectedRows = await _dbConnection.ExecuteAsync(
             ColorQueries.UpdateColor,
             new { color.Name, color.Id }
         );
