@@ -1,4 +1,4 @@
-using System.Text;
+using System.Data;
 using Dapper;
 using ScheduleService.Application.Common.Models;
 using ScheduleService.Application.Contracts;
@@ -8,15 +8,13 @@ using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
-public class RoomRepository(IDbContext dbContext) : IRoomRepository
+public class RoomRepository(IDbConnection dbConnection) : IRoomRepository
 {
-    private readonly IDbContext _dbContext = dbContext;
+    private readonly IDbConnection _dbConnection = dbConnection;
 
     public async Task<Room?> DeleteAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var room = await connection.QueryFirstOrDefaultAsync<Room>(
+        var room = await _dbConnection.QueryFirstOrDefaultAsync<Room>(
             RoomQueries.DeleteRoom,
             new { id }
         );
@@ -29,8 +27,6 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
         PaginationParameters paginationParameters
     )
     {
-        using var connection = _dbContext.CreateConnection();
-
         string searchCondition = "";
 
         if (!string.IsNullOrWhiteSpace(filter.SearchString))
@@ -63,7 +59,7 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 
         int totalCount = 0;
 
-        var rooms = await connection.QueryAsync<Room, long, Room>(
+        var rooms = await _dbConnection.QueryAsync<Room, long, Room>(
             query,
             (rooms, count) =>
             {
@@ -84,9 +80,7 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 
     public async Task<Room?> GetByIdAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var room = await connection.QueryFirstOrDefaultAsync<Room>(
+        var room = await _dbConnection.QueryFirstOrDefaultAsync<Room>(
             RoomQueries.GetRoomById,
             new { id }
         );
@@ -96,9 +90,7 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 
     public async Task<Room> InsertAsync(Room room)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var roomId = await connection.QuerySingleAsync<int>(
+        var roomId = await _dbConnection.QuerySingleAsync<int>(
             RoomQueries.InsertRoom,
             new { room.Name, room.FullName }
         );
@@ -110,15 +102,13 @@ public class RoomRepository(IDbContext dbContext) : IRoomRepository
 
     public async Task<Room?> UpdateAsync(Room room)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var affectedRows = await connection.ExecuteAsync(
+        var affectedRows = await _dbConnection.ExecuteAsync(
             RoomQueries.UpdateRoom,
             new
             {
                 Name = room.Name,
                 FullName = room.FullName,
-                Id = room.Id
+                Id = room.Id,
             }
         );
 

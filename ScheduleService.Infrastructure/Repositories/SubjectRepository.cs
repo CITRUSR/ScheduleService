@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text;
 using Dapper;
 using ScheduleService.Application.Common.Models;
@@ -8,15 +9,13 @@ using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
-public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
+public class SubjectRepository(IDbConnection dbConnection) : ISubjectRepository
 {
-    private readonly IDbContext _dbContext = dbContext;
+    private readonly IDbConnection _dbConnection = dbConnection;
 
     public async Task<Subject?> DeleteAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var subject = await connection.QueryFirstOrDefaultAsync<Subject>(
+        var subject = await _dbConnection.QueryFirstOrDefaultAsync<Subject>(
             SubjectQueries.DeleteSubject,
             new { id }
         );
@@ -29,8 +28,6 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
         PaginationParameters paginationParameters
     )
     {
-        using var connection = _dbContext.CreateConnection();
-
         var sqlBuilder = new StringBuilder();
 
         sqlBuilder.Append(SubjectQueries.GetSubjects);
@@ -62,7 +59,7 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
             $" OFFSET {(paginationParameters.Page - 1) * paginationParameters.PageSize}"
         );
 
-        using var multy = await connection.QueryMultipleAsync(
+        using var multy = await _dbConnection.QueryMultipleAsync(
             $"{countQuery}; {sqlBuilder};",
             new { searchString }
         );
@@ -82,13 +79,11 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
 
     public async Task<Subject?> GetByIdAsync(int id)
     {
-        using var connection = _dbContext.CreateConnection();
-
         var parameters = new DynamicParameters();
 
         parameters.Add("SubjectId", id);
 
-        var subject = await connection.QueryFirstOrDefaultAsync<Subject>(
+        var subject = await _dbConnection.QueryFirstOrDefaultAsync<Subject>(
             SubjectQueries.GetSubjectById,
             parameters
         );
@@ -98,9 +93,7 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
 
     public async Task<Subject> InsertAsync(Subject subject)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var subjectId = await connection.QuerySingleAsync<int>(
+        var subjectId = await _dbConnection.QuerySingleAsync<int>(
             SubjectQueries.InsertSubject,
             new { subject.Name, subject.Abbreviation }
         );
@@ -112,15 +105,13 @@ public class SubjectRepository(IDbContext dbContext) : ISubjectRepository
 
     public async Task<Subject?> UpdateAsync(Subject subject)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var affectedRows = await connection.ExecuteAsync(
+        var affectedRows = await _dbConnection.ExecuteAsync(
             SubjectQueries.UpdateSubject,
             new
             {
                 subject.Name,
                 subject.Abbreviation,
-                subject.Id
+                subject.Id,
             }
         );
 
