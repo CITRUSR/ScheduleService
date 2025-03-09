@@ -5,5 +5,12 @@ option csharp_namespace = "ScheduleService";
 package SpecialityTeacherSubject;
 
 service SpecialityTeacherSubjectService{
-    
+}
+
+message SpecialityTeacherSubjectModel{
+     int32 SpecialityId  = 1;
+     int32 Course  = 2;
+     int32 SubGroup  = 3;
+     string TeacherId  = 4;
+     int32 SubjectId  = 5;
 }
