@@ -6,5 +6,5 @@ public class SpecialityTeacherSubject
     public int Course { get; set; }
     public int SubGroup { get; set; }
     public Guid TeacherId { get; set; }
-    public Subject Subject { get; set; }
+    public int SubjectId { get; set; }
 }
