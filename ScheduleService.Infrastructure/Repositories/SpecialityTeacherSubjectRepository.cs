@@ -25,9 +25,24 @@ public class SpecialityTeacherSubjectRepository(IDbConnection dbConnection)
         return [.. result];
     }
 
-    public Task<SpecialityTeacherSubject?> GetByIdAsync(int specialityId, int course, int subgroup)
+    public async Task<SpecialityTeacherSubject?> GetByIdAsync(
+        int specialityId,
+        int course,
+        int subgroup
+    )
     {
-        throw new NotImplementedException();
+        var parameters = new DynamicParameters();
+
+        parameters.Add("@SpecialityId", specialityId);
+        parameters.Add("@Course", course);
+        parameters.Add("@Subgroup", subgroup);
+
+        var entity = await _dbConnection.QuerySingleOrDefaultAsync<SpecialityTeacherSubject>(
+            SpecialityTeacherSubjectQueries.GetById,
+            parameters
+        );
+
+        return entity;
     }
 
     public Task<SpecialityTeacherSubject> InsertAsync(
