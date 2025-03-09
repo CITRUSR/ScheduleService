@@ -1,6 +1,8 @@
 using System.Data;
+using Dapper;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Domain.Entities;
+using ScheduleService.Infrastructure.Repositories.Sql;
 
 namespace ScheduleService.Infrastructure.Repositories;
 
@@ -14,9 +16,13 @@ public class SpecialityTeacherSubjectRepository(IDbConnection dbConnection)
         throw new NotImplementedException();
     }
 
-    public Task<List<SpecialityTeacherSubject>> GetAllAsync()
+    public async Task<List<SpecialityTeacherSubject>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var result = await _dbConnection.QueryAsync<SpecialityTeacherSubject>(
+            SpecialityTeacherSubjectQueries.GetAll
+        );
+
+        return [.. result];
     }
 
     public Task<SpecialityTeacherSubject?> GetByIdAsync(int specialityId, int course, int subgroup)
