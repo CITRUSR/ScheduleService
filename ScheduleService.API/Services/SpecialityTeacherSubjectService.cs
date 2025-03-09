@@ -3,6 +3,7 @@ using Grpc.Core;
 using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Queries.GetAllSpecialityTeacherSubjects;
+using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Queries.GetSpecialityTeacherSubjectById;
 
 namespace ScheduleService.API.Services;
 
@@ -22,5 +23,17 @@ public class SpecialityTeacherSubjectService(IMediator mediator)
         {
             SpecialityTeacherSubjects = { entities.Adapt<List<SpecialityTeacherSubjectModel>>() },
         };
+    }
+
+    public override async Task<SpecialityTeacherSubjectModel> GetSpecialityTeacherSubjectById(
+        GetSpecialityTeacherSubjectByIdRequest request,
+        ServerCallContext context
+    )
+    {
+        var query = request.Adapt<GetSpecialityTeacherSubjectByIdQuery>();
+
+        var entity = await _mediator.Send(query);
+
+        return entity.Adapt<SpecialityTeacherSubjectModel>();
     }
 }
