@@ -8,6 +8,7 @@ import "google/protobuf/empty.proto";
 
 service SpecialityTeacherSubjectService{
     rpc GetAllSpecialityTeacherSubjects(google.protobuf.Empty) returns (GetSpecialityTeacherSubjectsResponse);
+    rpc GetSpecialityTeacherSubjectById(GetSpecialityTeacherSubjectByIdRequest) returns (SpecialityTeacherSubjectModel);
 }
 
 message SpecialityTeacherSubjectModel{
@@ -20,4 +21,10 @@ message SpecialityTeacherSubjectModel{
 
 message GetSpecialityTeacherSubjectsResponse{
     repeated SpecialityTeacherSubjectModel SpecialityTeacherSubjects = 1;
+}
+
+message GetSpecialityTeacherSubjectByIdRequest{
+    int32 SpecialityId  = 1;
+    int32 Course  = 2;
+    int32 SubGroup  = 3;
 }
