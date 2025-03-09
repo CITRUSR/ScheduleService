@@ -4,7 +4,10 @@ option csharp_namespace = "ScheduleService";
 
 package SpecialityTeacherSubject;
 
+import "google/protobuf/empty.proto";
+
 service SpecialityTeacherSubjectService{
+    rpc GetAllSpecialityTeacherSubjects(google.protobuf.Empty) returns (GetSpecialityTeacherSubjectsResponse);
 }
 
 message SpecialityTeacherSubjectModel{
@@ -13,4 +16,8 @@ message SpecialityTeacherSubjectModel{
      int32 SubGroup  = 3;
      string TeacherId  = 4;
      int32 SubjectId  = 5;
+}
+
+message GetSpecialityTeacherSubjectsResponse{
+    repeated SpecialityTeacherSubjectModel SpecialityTeacherSubjects = 1;
 }
