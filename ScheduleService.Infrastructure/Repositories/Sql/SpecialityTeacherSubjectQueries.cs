@@ -25,4 +25,13 @@ public static class SpecialityTeacherSubjectQueries
         INSERT INTO specialities_teachers_subjects (speciality_fk, course, subgroup, teacher_fk, subject_fk)
         VALUES (@SpecialityId, @Course, @Subgroup, @TeacherId, @SubjectId)
     ";
+
+    public static readonly string Delete =
+        @$"
+        DELETE FROM specialities_teachers_subjects
+        WHERE speciality_fk = @SpecialityId AND
+        course = @Course AND
+        subgroup = @Subgroup
+        RETURNING {AllColumns}
+    ";
 }

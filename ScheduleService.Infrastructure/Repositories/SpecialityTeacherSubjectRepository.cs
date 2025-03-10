@@ -11,9 +11,24 @@ public class SpecialityTeacherSubjectRepository(IDbConnection dbConnection)
 {
     private readonly IDbConnection _dbConnection = dbConnection;
 
-    public Task<SpecialityTeacherSubject?> DeleteAsync(int specialityId, int course, int subgroup)
+    public async Task<SpecialityTeacherSubject?> DeleteAsync(
+        int specialityId,
+        int course,
+        int subgroup
+    )
     {
-        throw new NotImplementedException();
+        var parameters = new DynamicParameters();
+
+        parameters.Add("@SpecialityId", specialityId);
+        parameters.Add("@Course", course);
+        parameters.Add("@Subgroup", subgroup);
+
+        var res = await _dbConnection.QuerySingleOrDefaultAsync<SpecialityTeacherSubject>(
+            SpecialityTeacherSubjectQueries.Delete,
+            parameters
+        );
+
+        return res;
     }
 
     public async Task<List<SpecialityTeacherSubject>> GetAllAsync()
