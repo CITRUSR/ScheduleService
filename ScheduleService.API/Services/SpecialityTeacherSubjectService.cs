@@ -2,6 +2,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Mapster;
 using MediatR;
+using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Commands.CreateSpecialityTeacherSubject;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Queries.GetAllSpecialityTeacherSubjects;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Queries.GetSpecialityTeacherSubjectById;
 
@@ -35,5 +36,17 @@ public class SpecialityTeacherSubjectService(IMediator mediator)
         var entity = await _mediator.Send(query);
 
         return entity.Adapt<SpecialityTeacherSubjectModel>();
+    }
+
+    public override async Task<SpecialityTeacherSubjectModel> CreateSpecialityTeacherSubject(
+        CreateSpecialityTeacherSubjectRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<CreateSpecialityTeacherSubjectCommand>();
+
+        var res = await _mediator.Send(command);
+
+        return res.Adapt<SpecialityTeacherSubjectModel>();
     }
 }
