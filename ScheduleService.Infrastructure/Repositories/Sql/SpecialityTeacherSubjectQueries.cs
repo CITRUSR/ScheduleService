@@ -19,4 +19,10 @@ public static class SpecialityTeacherSubjectQueries
         course = @Course AND
         subgroup = @Subgroup
     ";
+
+    public static readonly string Insert =
+        @$"
+        INSERT INTO specialities_teachers_subjects (speciality_fk, course, subgroup, teacher_fk, subject_fk)
+        VALUES (@SpecialityId, @Course, @Subgroup, @TeacherId, @SubjectId)
+    ";
 }
