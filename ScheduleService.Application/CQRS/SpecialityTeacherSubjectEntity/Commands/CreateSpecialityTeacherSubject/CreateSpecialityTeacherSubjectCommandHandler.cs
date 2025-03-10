@@ -1,4 +1,6 @@
 using MediatR;
+using Npgsql;
+using ScheduleService.Application.Common.Exceptions.SpecialityTeacherSubjectEntity;
 using ScheduleService.Application.Contracts;
 using ScheduleService.Application.Contracts.UserService.Speciality;
 using ScheduleService.Application.Contracts.UserService.Teacher;
@@ -43,7 +45,9 @@ public class CreateSpecialityTeacherSubjectCommandHandler(
             SubGroup = request.SubGroup,
         };
 
-        await _unitOfWork.SpecialityTeacherSubjectRepository.InsertAsync(entity);
+        try
+        {
+            await _unitOfWork.SpecialityTeacherSubjectRepository.InsertAsync(entity);
 
             _unitOfWork.CommitTransaction();
         }
