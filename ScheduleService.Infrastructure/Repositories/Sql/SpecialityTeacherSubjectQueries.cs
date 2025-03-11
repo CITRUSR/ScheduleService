@@ -34,4 +34,18 @@ public static class SpecialityTeacherSubjectQueries
         subgroup = @Subgroup
         RETURNING {AllColumns}
     ";
+
+    public static readonly string Update =
+        @$"
+        UPDATE specialities_teachers_subjects
+        SET course = @Course,
+        subgroup = @Subgroup,
+        teacher_fk = @TeacherId,
+        subject_fk = @SubjectId,
+        speciality_fk = @SpecialityId
+        WHERE speciality_fk = @SpecialityId AND
+        course = @Course AND
+        subgroup = @Subgroup
+        RETURNING {AllColumns}
+    ";
 }
