@@ -8,6 +8,7 @@ public interface IUnitOfWork
     IWeekdayRepository WeekdayRepository { get; }
     ICurrentWeekdayRepository CurrentWeekdayRepository { get; }
     IClassRepository ClassRepository { get; }
+    ISpecialityTeacherSubjectRepository SpecialityTeacherSubjectRepository { get; }
     void CommitTransaction();
     void RollbackTransaction();
 }

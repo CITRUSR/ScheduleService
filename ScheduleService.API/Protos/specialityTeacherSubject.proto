@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option csharp_namespace = "ScheduleService";
+
+package SpecialityTeacherSubject;
+
+import "google/protobuf/empty.proto";
+
+service SpecialityTeacherSubjectService{
+    rpc GetAllSpecialityTeacherSubjects(google.protobuf.Empty) returns (GetSpecialityTeacherSubjectsResponse);
+    rpc GetSpecialityTeacherSubjectById(GetSpecialityTeacherSubjectByIdRequest) returns (SpecialityTeacherSubjectModel);
+    rpc CreateSpecialityTeacherSubject(CreateSpecialityTeacherSubjectRequest) returns (SpecialityTeacherSubjectModel);
+    rpc DeleteSpecialityTeacherSubject(DeleteSpecialityTeacherSubjectRequest) returns (SpecialityTeacherSubjectModel);
+    rpc UpdateSpecialityTeacherSubject(UpdateSpecialityTeacherSubjectRequest) returns (SpecialityTeacherSubjectModel);
+}
+
+message SpecialityTeacherSubjectModel{
+     int32 SpecialityId  = 1;
+     int32 Course  = 2;
+     int32 SubGroup  = 3;
+     string TeacherId  = 4;
+     int32 SubjectId  = 5;
+}
+
+message GetSpecialityTeacherSubjectsResponse{
+    repeated SpecialityTeacherSubjectModel SpecialityTeacherSubjects = 1;
+}
+
+message GetSpecialityTeacherSubjectByIdRequest{
+    int32 SpecialityId  = 1;
+    int32 Course  = 2;
+    int32 SubGroup  = 3;
+}
+
+message CreateSpecialityTeacherSubjectRequest{
+    int32 SpecialityId  = 1;
+    int32 Course  = 2;
+    int32 SubGroup  = 3;
+    string TeacherId  = 4;
+    int32 SubjectId  = 5;
+}
+
+message DeleteSpecialityTeacherSubjectRequest{
+    int32 SpecialityId  = 1;
+    int32 Course  = 2;
+    int32 SubGroup  = 3;
+}
+
+message UpdateSpecialityTeacherSubjectRequest{
+    int32 SpecialityId  = 1;
+    int32 Course  = 2;
+    int32 SubGroup  = 3;
+    string TeacherId  = 4;
+    int32 SubjectId  = 5;
+}

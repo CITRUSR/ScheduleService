@@ -112,6 +112,10 @@ public static class DependencyInjection
         services.AddScoped<IWeekdayRepository, WeekdayRepository>();
         services.AddScoped<ICurrentWeekdayRepository, CurrentWeekdayRepository>();
         services.AddScoped<IClassRepository, ClassRepository>();
+        services.AddScoped<
+            ISpecialityTeacherSubjectRepository,
+            SpecialityTeacherSubjectRepository
+        >();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
