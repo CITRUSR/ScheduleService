@@ -21,6 +21,10 @@ public static class MapsterConfig
             && member.Type.GetGenericTypeDefinition() == typeof(RepeatedField<>)
         );
 
+        TypeAdapterConfig.GlobalSettings.Default.NameMatchingStrategy(
+            NameMatchingStrategy.IgnoreCase
+        );
+
         ConfigureCurrentWeekdayRequests();
         ConfigureCurrentWeekdayEntity();
         ConfigureClassRequests();
