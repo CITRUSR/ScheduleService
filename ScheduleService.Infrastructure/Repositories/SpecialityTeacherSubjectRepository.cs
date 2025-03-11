@@ -76,10 +76,23 @@ public class SpecialityTeacherSubjectRepository(IDbConnection dbConnection)
         return specialityTeacherSubject;
     }
 
-    public Task<SpecialityTeacherSubject?> UpdateAsync(
+    public async Task<SpecialityTeacherSubject?> UpdateAsync(
         SpecialityTeacherSubject specialityTeacherSubject
     )
     {
-        throw new NotImplementedException();
+        var parameters = new DynamicParameters();
+
+        parameters.Add("@SpecialityId", specialityTeacherSubject.SpecialityId);
+        parameters.Add("@Course", specialityTeacherSubject.Course);
+        parameters.Add("@Subgroup", specialityTeacherSubject.SubGroup);
+        parameters.Add("@TeacherId", specialityTeacherSubject.TeacherId);
+        parameters.Add("@SubjectId", specialityTeacherSubject.SubjectId);
+
+        var res = await _dbConnection.QuerySingleOrDefaultAsync<SpecialityTeacherSubject>(
+            SpecialityTeacherSubjectQueries.Update,
+            parameters
+        );
+
+        return res;
     }
 }
