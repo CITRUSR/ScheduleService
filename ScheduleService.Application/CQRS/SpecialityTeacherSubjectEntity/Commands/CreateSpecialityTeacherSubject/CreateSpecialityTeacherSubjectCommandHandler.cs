@@ -2,40 +2,24 @@ using MediatR;
 using Npgsql;
 using ScheduleService.Application.Common.Exceptions.SpecialityTeacherSubjectEntity;
 using ScheduleService.Application.Contracts;
-using ScheduleService.Application.Contracts.UserService.Speciality;
-using ScheduleService.Application.Contracts.UserService.Teacher;
-using ScheduleService.Application.CQRS.SubjectEntity.Queries.GetSubjectById;
+using ScheduleService.Application.Contracts.Services;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Commands.CreateSpecialityTeacherSubject;
 
 public class CreateSpecialityTeacherSubjectCommandHandler(
     IUnitOfWork unitOfWork,
-    IMediator mediator,
-    ITeacherService teacherService,
-    ISpecialityService specialityService
+    ISpecialityTeacherSubjectRelatedDataChecker dataChecker
 ) : IRequestHandler<CreateSpecialityTeacherSubjectCommand, SpecialityTeacherSubject>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IMediator _mediator = mediator;
-    private readonly ITeacherService _teacherService = teacherService;
-    private readonly ISpecialityService _specialityService = specialityService;
+    private readonly ISpecialityTeacherSubjectRelatedDataChecker _dataChecker = dataChecker;
 
     public async Task<SpecialityTeacherSubject> Handle(
         CreateSpecialityTeacherSubjectCommand request,
         CancellationToken cancellationToken
     )
     {
-        await _mediator.Send(new GetSubjectByIdQuery(request.SubjectId), cancellationToken);
-
-        List<Task> checkTasks =
-        [
-            _teacherService.GetTeacherById(request.TeacherId),
-            _specialityService.GetSpecialityById(request.SpecialityId),
-        ];
-
-        await Task.WhenAll(checkTasks);
-
         var entity = new SpecialityTeacherSubject()
         {
             SpecialityId = request.SpecialityId,
@@ -44,6 +28,8 @@ public class CreateSpecialityTeacherSubjectCommandHandler(
             SubjectId = request.SubjectId,
             SubGroup = request.SubGroup,
         };
+
+        await _dataChecker.Check(entity);
 
         try
         {
