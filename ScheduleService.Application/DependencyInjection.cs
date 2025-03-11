@@ -32,5 +32,9 @@ public static class DependencyInjection
     public static void RegisterServices(IServiceCollection services)
     {
         services.AddScoped<IClassService, ClassService>();
+        services.AddScoped<
+            ISpecialityTeacherSubjectRelatedDataChecker,
+            SpecialityTeacherSubjectRelatedDataChecker
+        >();
     }
 }
