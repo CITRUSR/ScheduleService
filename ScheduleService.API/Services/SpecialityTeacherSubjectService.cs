@@ -4,6 +4,7 @@ using Mapster;
 using MediatR;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Commands.CreateSpecialityTeacherSubject;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Commands.DeleteSpecialityTeacherSubject;
+using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Commands.UpdateSpecialityTeacherSubject;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Queries.GetAllSpecialityTeacherSubjects;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Queries.GetSpecialityTeacherSubjectById;
 
@@ -57,6 +58,18 @@ public class SpecialityTeacherSubjectService(IMediator mediator)
     )
     {
         var command = request.Adapt<DeleteSpecialityTeacherSubjectCommand>();
+
+        var res = await _mediator.Send(command);
+
+        return res.Adapt<SpecialityTeacherSubjectModel>();
+    }
+
+    public override async Task<SpecialityTeacherSubjectModel> UpdateSpecialityTeacherSubject(
+        UpdateSpecialityTeacherSubjectRequest request,
+        ServerCallContext context
+    )
+    {
+        var command = request.Adapt<UpdateSpecialityTeacherSubjectCommand>();
 
         var res = await _mediator.Send(command);
 

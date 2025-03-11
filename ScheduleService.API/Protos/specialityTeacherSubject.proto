@@ -11,6 +11,7 @@ service SpecialityTeacherSubjectService{
     rpc GetSpecialityTeacherSubjectById(GetSpecialityTeacherSubjectByIdRequest) returns (SpecialityTeacherSubjectModel);
     rpc CreateSpecialityTeacherSubject(CreateSpecialityTeacherSubjectRequest) returns (SpecialityTeacherSubjectModel);
     rpc DeleteSpecialityTeacherSubject(DeleteSpecialityTeacherSubjectRequest) returns (SpecialityTeacherSubjectModel);
+    rpc UpdateSpecialityTeacherSubject(UpdateSpecialityTeacherSubjectRequest) returns (SpecialityTeacherSubjectModel);
 }
 
 message SpecialityTeacherSubjectModel{
@@ -43,4 +44,12 @@ message DeleteSpecialityTeacherSubjectRequest{
     int32 SpecialityId  = 1;
     int32 Course  = 2;
     int32 SubGroup  = 3;
+}
+
+message UpdateSpecialityTeacherSubjectRequest{
+    int32 SpecialityId  = 1;
+    int32 Course  = 2;
+    int32 SubGroup  = 3;
+    string TeacherId  = 4;
+    int32 SubjectId  = 5;
 }
