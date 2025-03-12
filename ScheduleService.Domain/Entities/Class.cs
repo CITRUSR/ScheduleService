@@ -1,6 +1,6 @@
 namespace ScheduleService.Domain.Entities;
 
-public class Class
+public class Class : BaseModel
 {
     public int Id { get; set; }
     public int GroupId { get; set; }

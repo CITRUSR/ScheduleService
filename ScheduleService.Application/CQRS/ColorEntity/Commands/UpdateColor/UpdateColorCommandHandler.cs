@@ -2,14 +2,18 @@ using MediatR;
 using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.ColorEntity.Commands.UpdateColor;
 
-public class UpdateColorCommandHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<UpdateColorCommand, Color>
+public class UpdateColorCommandHandler(
+    IUnitOfWork unitOfWork,
+    IUniqueConstraintExceptionChecker uniqueChecker
+) : IRequestHandler<UpdateColorCommand, Color>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IUniqueConstraintExceptionChecker _uniqueChecker = uniqueChecker;
 
     public async Task<Color> Handle(UpdateColorCommand request, CancellationToken cancellationToken)
     {
@@ -28,13 +32,15 @@ public class UpdateColorCommandHandler(IUnitOfWork unitOfWork)
 
             _unitOfWork.CommitTransaction();
         }
-        catch (NpgsqlException ex) when (ex.SqlState == "23505")
+        catch (Exception ex)
         {
-            _unitOfWork.RollbackTransaction();
-            throw new ColorNameAlreadyExistsException(request.Name);
-        }
-        catch
-        {
+            var propName = _uniqueChecker.Check<Color>(ex);
+
+            if (propName != null && propName.Equals("name", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ColorNameAlreadyExistsException(request.Name);
+            }
+
             _unitOfWork.RollbackTransaction();
             throw;
         }

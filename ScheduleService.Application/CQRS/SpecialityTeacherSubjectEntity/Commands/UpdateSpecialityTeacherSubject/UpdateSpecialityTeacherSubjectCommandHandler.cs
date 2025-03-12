@@ -1,7 +1,7 @@
 using MediatR;
-using Npgsql;
 using ScheduleService.Application.Common.Exceptions.SpecialityTeacherSubjectEntity;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Application.Contracts.Services;
 using ScheduleService.Domain.Entities;
 
@@ -9,12 +9,16 @@ namespace ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Comman
 
 public class UpdateSpecialityTeacherSubjectCommandHandler(
     IUnitOfWork unitOfWork,
-    ISpecialityTeacherSubjectRelatedDataChecker spTcSbRelatedDataChecker
+    ISpecialityTeacherSubjectRelatedDataChecker spTcSbRelatedDataChecker,
+    IUniqueConstraintExceptionChecker uniqueChecker
 ) : IRequestHandler<UpdateSpecialityTeacherSubjectCommand, SpecialityTeacherSubject>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ISpecialityTeacherSubjectRelatedDataChecker _spTcSbRelatedDataChecker =
         spTcSbRelatedDataChecker;
+    private readonly IUniqueConstraintExceptionChecker _uniqueChecker = uniqueChecker;
+    private readonly HashSet<string> pKeyFields = ["speciality", "course", "subgroup"];
+    private readonly HashSet<string> tchSubFields = ["teacher", "subject"];
 
     public async Task<SpecialityTeacherSubject> Handle(
         UpdateSpecialityTeacherSubjectCommand request,
@@ -51,28 +55,24 @@ public class UpdateSpecialityTeacherSubjectCommandHandler(
         }
         catch (Exception ex)
         {
-            if (ex is PostgresException postgresException)
+            var field = _uniqueChecker.Check<SpecialityTeacherSubject>(ex);
+
+            if (field != null)
             {
-                if (postgresException.SqlState == "23505")
+                if (pKeyFields.Contains(field, StringComparer.OrdinalIgnoreCase))
                 {
-                    if (postgresException.Detail.Contains("speciality_fk"))
-                    {
-                        throw new PrimarySpecialityTeacherSubjectAlreadyExistsException(
-                            updatedSpecialityTeacherSubject.SpecialityId,
-                            updatedSpecialityTeacherSubject.Course,
-                            updatedSpecialityTeacherSubject.SubGroup
-                        );
-                    }
-                    else if (postgresException.Detail.Contains("speciality_fk"))
-                    {
-                        if (postgresException.Detail.Contains("teacher_fk"))
-                        {
-                            throw new TeacherSubjectCombinationAlreadyExistsException(
-                                updatedSpecialityTeacherSubject.TeacherId,
-                                updatedSpecialityTeacherSubject.SubjectId
-                            );
-                        }
-                    }
+                    throw new PrimarySpecialityTeacherSubjectAlreadyExistsException(
+                        updatedSpecialityTeacherSubject.SpecialityId,
+                        updatedSpecialityTeacherSubject.Course,
+                        updatedSpecialityTeacherSubject.SubGroup
+                    );
+                }
+                else if (tchSubFields.Contains(field, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new TeacherSubjectCombinationAlreadyExistsException(
+                        updatedSpecialityTeacherSubject.TeacherId,
+                        updatedSpecialityTeacherSubject.SubjectId
+                    );
                 }
             }
 

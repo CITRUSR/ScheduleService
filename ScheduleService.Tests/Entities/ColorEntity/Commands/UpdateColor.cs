@@ -1,9 +1,9 @@
 using AutoFixture;
 using FluentAssertions;
 using Moq;
-using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Application.CQRS.ColorEntity.Commands.UpdateColor;
 using ScheduleService.Domain.Entities;
 
@@ -13,6 +13,7 @@ public class UpdateColor
 {
     private readonly Fixture _fixture;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IUniqueConstraintExceptionChecker> _mockChecker;
     private readonly UpdateColorCommand _command;
     private readonly UpdateColorCommandHandler _handler;
 
@@ -20,8 +21,9 @@ public class UpdateColor
     {
         _fixture = new Fixture();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockChecker = new Mock<IUniqueConstraintExceptionChecker>();
         _command = _fixture.Build<UpdateColorCommand>().With(x => x.Name, "Yellow").Create();
-        _handler = new UpdateColorCommandHandler(_mockUnitOfWork.Object);
+        _handler = new UpdateColorCommandHandler(_mockUnitOfWork.Object, _mockChecker.Object);
     }
 
     [Fact]
@@ -57,16 +59,17 @@ public class UpdateColor
     [Fact]
     public async Task UpdateColor_ShouldBe_ColorNameAlreadyExistsException()
     {
-        _mockUnitOfWork
-            .Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()))
-            .ReturnsAsync(new Color());
+        var ex = new Exception("Unique ex");
 
-        _mockUnitOfWork
-            .Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()))
-            .Throws(new PostgresException("Unique", "severity", "invariantServerity", "23505"));
+        _mockUnitOfWork.Setup(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>())).Throws(ex);
+        _mockChecker.Setup(x => x.Check<Color>(ex)).Returns("Name");
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
         await act.Should().ThrowAsync<ColorNameAlreadyExistsException>();
+
+        _mockUnitOfWork.Verify(x => x.ColorRepository.UpdateAsync(It.IsAny<Color>()), Times.Once());
+        _mockChecker.Verify(x => x.Check<Color>(ex), Times.Once());
+        _mockUnitOfWork.Verify(x => x.CommitTransaction(), Times.Never());
     }
 }

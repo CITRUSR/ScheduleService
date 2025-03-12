@@ -6,9 +6,11 @@ using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Application.Contracts.UserService.Group;
 using ScheduleService.Application.Contracts.UserService.Speciality;
 using ScheduleService.Application.Contracts.UserService.Teacher;
+using ScheduleService.Infrastructure.Helpers;
 using ScheduleService.Infrastructure.Repositories;
 using ScheduleService.Infrastructure.Services.UserService;
 
@@ -44,6 +46,7 @@ public static class DependencyInjection
 
         AddUserService(services, configuration);
         RegisterRepositories(services);
+        RegisterHelpers(services);
 
         return services;
     }
@@ -117,6 +120,14 @@ public static class DependencyInjection
             SpecialityTeacherSubjectRepository
         >();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+    }
+
+    private static void RegisterHelpers(IServiceCollection services)
+    {
+        services.AddSingleton<
+            IUniqueConstraintExceptionChecker,
+            PostgresUniqueConstraintExceptionChecker
+        >();
     }
 
     private static void AddGrpcClient<T>(
