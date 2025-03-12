@@ -1,15 +1,18 @@
 using MediatR;
-using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.RoomEntity.Commands.UpdateRoom;
 
-public class UpdateRoomCommandHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<UpdateRoomCommand, Room>
+public class UpdateRoomCommandHandler(
+    IUnitOfWork unitOfWork,
+    IUniqueConstraintExceptionChecker uniqueChecker
+) : IRequestHandler<UpdateRoomCommand, Room>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IUniqueConstraintExceptionChecker _uniqueChecker = uniqueChecker;
 
     public async Task<Room> Handle(UpdateRoomCommand request, CancellationToken cancellationToken)
     {
@@ -17,7 +20,7 @@ public class UpdateRoomCommandHandler(IUnitOfWork unitOfWork)
         {
             Id = request.Id,
             Name = request.Name,
-            FullName = request.FullName
+            FullName = request.FullName,
         };
 
         Room updatedRoom;
@@ -33,14 +36,17 @@ public class UpdateRoomCommandHandler(IUnitOfWork unitOfWork)
 
             _unitOfWork.CommitTransaction();
         }
-        catch (NpgsqlException ex) when (ex.SqlState == "23505")
+        catch (Exception ex)
         {
             _unitOfWork.RollbackTransaction();
-            throw new RoomNameAlreadyExistsException(request.Name);
-        }
-        catch
-        {
-            _unitOfWork.RollbackTransaction();
+
+            var field = _uniqueChecker.Check<Room>(ex);
+
+            if (field != null && field.Equals("name", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new RoomNameAlreadyExistsException(request.Name);
+            }
+
             throw;
         }
 
