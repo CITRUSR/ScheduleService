@@ -2,6 +2,7 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Application.Contracts.Services;
 using ScheduleService.Application.CQRS.SpecialityTeacherSubjectEntity.Commands.UpdateSpecialityTeacherSubject;
 using ScheduleService.Domain.Entities;
@@ -12,6 +13,7 @@ public class UpdateSpecialityTeacherSubject
 {
     private readonly IFixture _fixture;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IUniqueConstraintExceptionChecker> _mockUniqueChecker;
     private readonly Mock<ISpecialityTeacherSubjectRelatedDataChecker> _mockChecker;
     private readonly UpdateSpecialityTeacherSubjectCommandHandler _handler;
 
@@ -20,9 +22,11 @@ public class UpdateSpecialityTeacherSubject
         _fixture = new Fixture();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockChecker = new Mock<ISpecialityTeacherSubjectRelatedDataChecker>();
+        _mockUniqueChecker = new Mock<IUniqueConstraintExceptionChecker>();
         _handler = new UpdateSpecialityTeacherSubjectCommandHandler(
             _mockUnitOfWork.Object,
-            _mockChecker.Object
+            _mockChecker.Object,
+            _mockUniqueChecker.Object
         );
     }
 
