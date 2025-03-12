@@ -1,6 +1,6 @@
 namespace ScheduleService.Domain.Entities;
 
-public class SpecialityTeacherSubject
+public class SpecialityTeacherSubject : BaseModel
 {
     public int SpecialityId { get; set; }
     public int Course { get; set; }

@@ -1,6 +1,6 @@
 namespace ScheduleService.Domain.Entities;
 
-public class CurrentWeekday
+public class CurrentWeekday : BaseModel
 {
     public int Id { get; set; }
     public string Color { get; set; }
