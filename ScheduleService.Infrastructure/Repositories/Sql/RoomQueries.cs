@@ -2,31 +2,31 @@ namespace ScheduleService.Infrastructure.Repositories.Sql;
 
 public class RoomQueries
 {
-    public static string InsertRoom =
+    public static readonly string InsertRoom =
         @"
             INSERT INTO rooms (name, full_name)
             VALUES (@Name, @FullName)
             RETURNING id;
         ";
-    public static string GetRoomById =
+    public static readonly string GetRoomById =
         @"
             SELECT id, name, full_name AS FullName FROM rooms
             WHERE id = @Id;
         ";
-    public static string UpdateRoom =
+    public static readonly string UpdateRoom =
         @"
             UPDATE rooms
             SET name = @Name,
             full_name = @FullName
             WHERE id = @Id;
         ";
-    public static string DeleteRoom =
+    public static readonly string DeleteRoom =
         @"
             DELETE FROM rooms
             WHERE id = @Id
             RETURNING id, name, full_name AS FullName;
         ";
-    public static string GetRooms =
+    public static readonly string GetRooms =
         @"
             WITH filtered_rooms AS(
                 SELECT id, name, full_name AS FullName FROM rooms
@@ -39,7 +39,7 @@ public class RoomQueries
             OFFSET @Offset
         ";
 
-    public static string GetRoomsById =
+    public static readonly string GetRoomsById =
         @"
             SELECT * FROM rooms
             WHERE id IN ({0})

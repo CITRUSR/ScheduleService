@@ -2,18 +2,18 @@ namespace ScheduleService.Infrastructure.Repositories.Sql;
 
 public static class CurrentWeekdayQueries
 {
-    public static string GetCurrentWeekday =
+    public static readonly string GetCurrentWeekday =
         @"
             SELECT id, color, interval, updated_at AS UpdatedAt FROM current_weekday
             LIMIT 1;
         ";
-    public static string InsertCurrentWeekday =
+    public static readonly string InsertCurrentWeekday =
         @"
             INSERT INTO current_weekday (color, interval)
             VALUES (@Color, @Interval)
             RETURNING id;
         ";
-    public static string UpdateCurrentWeekday =
+    public static readonly string UpdateCurrentWeekday =
         @"
             UPDATE current_weekday
             SET color = @Color,

@@ -2,12 +2,12 @@ namespace ScheduleService.Infrastructure.Repositories.Sql;
 
 public static class WeekdayQueries
 {
-    public static string GetWeekdayById =
+    public static readonly string GetWeekdayById =
         @"
             SELECT * FROM weekdays
             WHERE id = @WeekdayId;
         ";
-    public static string GetAllWeekdays =
+    public static readonly string GetAllWeekdays =
         @"
             SELECT * FROM weekdays
         ";
