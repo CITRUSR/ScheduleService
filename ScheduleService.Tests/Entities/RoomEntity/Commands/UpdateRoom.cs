@@ -1,9 +1,9 @@
 using AutoFixture;
 using FluentAssertions;
 using Moq;
-using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Application.CQRS.RoomEntity.Commands.UpdateRoom;
 using ScheduleService.Domain.Entities;
 
@@ -13,6 +13,7 @@ public class UpdateRoom
 {
     private readonly Fixture _fixture;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IUniqueConstraintExceptionChecker> _mockUniqueChecker;
     private readonly UpdateRoomCommandHandler _handler;
     private readonly UpdateRoomCommand _command;
 
@@ -20,7 +21,8 @@ public class UpdateRoom
     {
         _fixture = new Fixture();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _handler = new UpdateRoomCommandHandler(_mockUnitOfWork.Object);
+        _mockUniqueChecker = new Mock<IUniqueConstraintExceptionChecker>();
+        _handler = new UpdateRoomCommandHandler(_mockUnitOfWork.Object, _mockUniqueChecker.Object);
         _command = _fixture.Build<UpdateRoomCommand>().Create();
     }
 
@@ -57,16 +59,17 @@ public class UpdateRoom
     [Fact]
     public async Task UpdateRoom_ShouldBe_RoomNameAlreadyExistsException()
     {
-        _mockUnitOfWork
-            .Setup(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()))
-            .ReturnsAsync(new Room());
+        var ex = new Exception("Unique ex");
 
-        _mockUnitOfWork
-            .Setup(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()))
-            .Throws(new PostgresException("Unique", "severity", "invariantServerity", "23505"));
+        _mockUnitOfWork.Setup(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>())).Throws(ex);
+        _mockUniqueChecker.Setup(x => x.Check<Room>(ex)).Returns("name");
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
         await act.Should().ThrowAsync<RoomNameAlreadyExistsException>();
+
+        _mockUnitOfWork.Verify(x => x.RoomRepository.UpdateAsync(It.IsAny<Room>()), Times.Once());
+        _mockUniqueChecker.Verify(x => x.Check<Room>(ex), Times.Once());
+        _mockUnitOfWork.Verify(x => x.RollbackTransaction(), Times.Once());
     }
 }
