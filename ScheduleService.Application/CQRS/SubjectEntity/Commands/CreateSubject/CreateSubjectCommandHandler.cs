@@ -1,15 +1,18 @@
 using MediatR;
-using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Domain.Entities;
 
 namespace ScheduleService.Application.CQRS.SubjectEntity.Commands.CreateSubject;
 
-public class CreateSubjectCommandHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<CreateSubjectCommand, Subject>
+public class CreateSubjectCommandHandler(
+    IUnitOfWork unitOfWork,
+    IUniqueConstraintExceptionChecker uniqueChecker
+) : IRequestHandler<CreateSubjectCommand, Subject>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IUniqueConstraintExceptionChecker _uniqueChecker = uniqueChecker;
 
     public async Task<Subject> Handle(
         CreateSubjectCommand request,
@@ -26,15 +29,16 @@ public class CreateSubjectCommandHandler(IUnitOfWork unitOfWork)
 
             _unitOfWork.CommitTransaction();
         }
-        catch (NpgsqlException ex) when (ex.SqlState == "23505")
+        catch (Exception ex)
         {
             _unitOfWork.RollbackTransaction();
 
-            throw new SubjectNameAlreadyExistsException(request.Name);
-        }
-        catch
-        {
-            _unitOfWork.RollbackTransaction();
+            var prop = _uniqueChecker.Check<Subject>(ex);
+
+            if (prop != null && prop.Equals("name", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new SubjectNameAlreadyExistsException(request.Name);
+            }
             throw;
         }
 

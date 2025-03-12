@@ -1,9 +1,9 @@
 using AutoFixture;
 using FluentAssertions;
 using Moq;
-using Npgsql;
 using ScheduleService.Application.Common.Exceptions;
 using ScheduleService.Application.Contracts;
+using ScheduleService.Application.Contracts.Helpers;
 using ScheduleService.Application.CQRS.SubjectEntity.Commands.UpdateSubject;
 using ScheduleService.Domain.Entities;
 
@@ -13,6 +13,7 @@ public class UpdateSubject
 {
     private readonly Fixture _fixture;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IUniqueConstraintExceptionChecker> _mockUniqueChecker;
     private readonly UpdateSubjectCommandHandler _handler;
     private readonly UpdateSubjectCommand _command;
 
@@ -20,7 +21,11 @@ public class UpdateSubject
     {
         _fixture = new Fixture();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _handler = new UpdateSubjectCommandHandler(_mockUnitOfWork.Object);
+        _mockUniqueChecker = new Mock<IUniqueConstraintExceptionChecker>();
+        _handler = new UpdateSubjectCommandHandler(
+            _mockUnitOfWork.Object,
+            _mockUniqueChecker.Object
+        );
         _command = _fixture.Create<UpdateSubjectCommand>();
     }
 
@@ -60,12 +65,23 @@ public class UpdateSubject
     [Fact]
     public async Task UpdateSubject_ShouldBe_SubjectNameAlreadyExistsException()
     {
-        _mockUnitOfWork
-            .Setup(x => x.SubjectRepository.UpdateAsync(It.IsAny<Subject>()))
-            .Throws(new PostgresException("Unique", "severity", "invariantServerity", "23505"));
+        var ex = new Exception("Unique ex");
+
+        _mockUnitOfWork.Setup(x => x.SubjectRepository.UpdateAsync(It.IsAny<Subject>())).Throws(ex);
+
+        _mockUniqueChecker.Setup(x => x.Check<Subject>(ex)).Returns("name");
 
         Func<Task> act = async () => await _handler.Handle(_command, default);
 
         await act.Should().ThrowAsync<SubjectNameAlreadyExistsException>();
+
+        _mockUnitOfWork.Verify(
+            x => x.SubjectRepository.UpdateAsync(It.IsAny<Subject>()),
+            Times.Once()
+        );
+
+        _mockUnitOfWork.Verify(x => x.RollbackTransaction(), Times.Once());
+
+        _mockUniqueChecker.Verify(x => x.Check<Subject>(ex), Times.Once());
     }
 }
